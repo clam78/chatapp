@@ -1,4 +1,227 @@
-<h1>Hello World!</h1>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Roommate Chatroom</title>
+        <script type="importmap">
+            {
+                "imports": {
+                    "vue": "https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.esm-browser.js",
+                    "@graffiti-garden/implementation-local": "https://cdn.jsdelivr.net/npm/@graffiti-garden/implementation-local@0.6.4/dist/browser/index.js",
+                    "@graffiti-garden/implementation-remote": "https://cdn.jsdelivr.net/npm/@graffiti-garden/implementation-remote@0.6.2/dist/browser/index.js",
+                    "@graffiti-garden/wrapper-vue": "https://cdn.jsdelivr.net/npm/@graffiti-garden/wrapper-vue@0.7.2/dist/browser/plugin.mjs"
+                }
+            }
+        </script>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="app">
+            <h1>Roommate Chatroom</h1>
+            <button v-if="!$graffitiSession.value" @click="$graffiti.login()">
+                Log In
+            </button>
+            <template v-else>
+                <button @click="$graffiti.logout($graffitiSession.value)">
+                    Log Out
+                </button>
 
-<a href="hhttps://github.com/designftw-2025/hw11-clam78">View Source Code on GitHub</a>
-<a href="https://clam78.github.io/chatapp/">View Live Chat App</a>
+                <!-- <button @click="clearAll">Clear All Chats and Messages</button> -->
+
+                <form 
+                    v-if="!leftGroupChats.includes(selectedChannel)"
+                    @submit.prevent="sendMessage($graffitiSession.value)">
+                    <fieldset :disabled="sending">
+                        <input
+                            type="text"
+                            v-model="myMessage"
+                            placeholder="Message"
+                            ref="messageInput"
+                            v-focus
+                        />
+                        <input
+                            type="submit"
+                            :value="sending? 'Sending...' : 'Send'"
+                        />
+                    </fieldset>
+                </form>
+                <p v-else style="color: gray;">
+                    You can't send messages in a chat you've left. Click "Join" to rejoin.
+                </p>
+
+                <form @submit.prevent="createGroupChat($graffitiSession.value)">
+                    <fieldset :disabled="sending">
+                        <input
+                            type="text"
+                            v-model="myGroupChat"
+                            placeholder="New Groupchat"
+                            ref="messageInput"
+                            v-focus
+                        />
+                        <input
+                            type="submit"
+                            :value="creating? 'Creating...' : 'Create'"
+                        />
+                    </fieldset>
+                </form>
+
+            </template>
+
+
+            <h2>Messages</h2>
+
+            <button v-if="selectedChannel" @click="selectedChannel = null">← Back to Group List</button>
+
+            <graffiti-discover
+                v-if="selectedChannel"
+                v-slot="{ objects: messageObjects, isInitialPolling }"
+                :channels="[selectedChannel]"
+                :schema="{
+                    properties: {
+                        value: {
+                            required: ['content', 'published'],
+                            properties: {
+                                content: { type: 'string' },
+                                published: { type: 'number' }
+                            }
+                        }
+                    }
+                }"
+            >
+                <ul>
+                    <li v-if="isInitialPolling">Loading...</li>
+                    <li
+                        v-for="object of messageObjects.sort((a, b) => b.value.published - a.value.published)"
+                        :key="object.url"
+                    >
+                        <strong>
+                            {{ object.actor }}<span
+                                v-if="object.actor===$graffitiSession.value.actor"
+                            >
+                                (you)</span
+                            ></strong
+                        >: 
+
+                    
+                        <template v-if="editingMessageID === object.url">
+                            <input
+                              type="text"
+                              v-model="editedMessage"
+                              @keyup.enter="submitEdit(object)"
+                            />
+                            <button @click="submitEdit(object)">Save</button>
+                            <button @click="editingMessageID = null">Cancel</button>
+                          </template>
+                        
+                        <template v-else>
+                            {{ object.value.content }}
+                            <span v-if="object.value.edited" style="color: gray; font-size: 0.9em;">
+                                (edited)
+                            </span>
+                            <button
+                              v-if="object.actor === $graffitiSession.value.actor"
+                              @click="startEditing(object)"
+                            >
+                            Edit
+                            </button>
+
+                            <button
+                              v-if="object.actor === $graffitiSession.value.actor"
+                              @click="deleteMessage(object)"
+                              style="color: red;"
+                            >
+                            Delete
+                            </button>
+                            
+                        </template>  
+
+                        
+
+                    </li>
+                </ul>
+            </graffiti-discover>
+
+
+
+            <template v-if="!leftGroupChats.includes(selectedChannel)">
+                <graffiti-discover
+                v-slot="{objects: groupChatObjects }"
+                :channels="channels"
+                :schema="{
+                }"
+            >
+            <h2>Dorm Chats</h2>
+            <ul>
+                <li v-for="chat in groupChatObjects.filter(c => c.value?.object?.channel && c.value?.object?.name)" 
+                :key="chat.url" 
+                class="group-chat" 
+                :class="{ selected: selectedChannel === chat.value.object.channel  }"
+                @click="selectedChannel = chat.value.object.channel">
+                    <!-- {{  chat.value?.object?.name || 'My Group Chat' }} -->
+                
+
+                <template v-if="editingGroupChatID === chat.url">
+                    <input
+                              type="text"
+                              v-model="editedGroupChat"
+                              @keyup.enter="submitGroupChatEdit(chat)"
+                            />
+                            <button @click="submitGroupChatEdit(chat)">Save</button>
+                            <button @click="editingGroupChatID = null">Cancel</button>
+                </template>
+            
+                <template v-else>
+                    <span @click="selectedChannel = chat.value.object.channel">
+                        {{ chat.value.object.name }}
+                    </span>
+                    <button 
+                        v-if="chat.actor === $graffitiSession.value.actor"
+                        @click="startGroupChatEditing(chat)">
+                        Edit
+                    </button>
+
+                    <button 
+                        v-if="chat.actor === $graffitiSession.value.actor"
+                        @click="deleteGroupChat(chat)"
+                        style="color: red;"
+                        >
+                        Delete
+                    </button>
+
+                    <button
+                        v-if="leftGroupChats.includes(chat.value.object.channel)"
+                        @click="joinGroupChat(chat)"
+                        style="color: rgb(27, 90, 5);"
+                    >
+                        Join
+                    </button>
+
+                    <button 
+                        v-if="!leftGroupChats.includes(chat.value.object.channel)"
+                        @click="leaveGroupChat(chat)"
+                        style="color: rgb(32, 7, 175);"
+                        >
+                        Leave
+                    </button>
+                </template>
+
+                </li>
+            </ul>
+
+            </graffiti-discover>
+            </template>
+
+            <template v-else>
+                <p style="color: gray;">You left the chat.</p>
+            </template>
+
+
+           
+
+
+        </div>
+
+        <script src="index.js" type="module"></script>
+    </body>
+</html>

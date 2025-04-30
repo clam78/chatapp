@@ -1,0 +1,42 @@
+* {
+    font-family:
+        Helvetica Neue,
+        Segoe UI,
+        sans-serif;
+}
+
+button,
+input {
+    margin: 3px;
+}
+
+input[type="text"] {
+    width: 300px;
+}
+
+:checked + input[type="text"] {
+    color: gray;
+    font-style: italic;
+    text-decoration: line-through;
+}
+
+fieldset {
+    display: contents;
+}
+
+.group-chat {
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 6px;
+  }
+  
+.group-chat:hover {
+    background-color: #e0f7ff;
+  }
+
+.group-chat.selected {
+    background-color: #d0f0ff;
+    border-left: 4px solid #2196f3;
+    font-weight: bold;
+}
