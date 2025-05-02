@@ -18,19 +18,21 @@
     </head>
     <body>
         <div id="app">
-            <h1>Roommate Chatroom</h1>
-            <button v-if="!$graffitiSession.value" @click="$graffiti.login()">
-                Log In
-            </button>
-            <template v-else>
-                <button @click="$graffiti.logout($graffitiSession.value)">
-                    Log Out
+            <template v-if="loginStage==='chat'">
+                <h1>Roommate Chatroom</h1>
+
+
+                <button @click="logout">
+                Log Out
                 </button>
 
-                <!-- <button @click="clearAll">Clear All Chats and Messages</button> -->
+                <p v-if="$graffitiSession.value">
+                    Logged in as: {{ $graffitiSession.value.actor }}
+                </p>
+
 
                 <form 
-                    v-if="!leftGroupChats.includes(selectedChannel)"
+                v-if="selectedChannel && !leftGroupChats.includes(selectedChannel)"
                     @submit.prevent="sendMessage($graffitiSession.value)">
                     <fieldset :disabled="sending">
                         <input
@@ -38,7 +40,7 @@
                             v-model="myMessage"
                             placeholder="Message"
                             ref="messageInput"
-                            v-focus
+                            
                         />
                         <input
                             type="submit"
@@ -49,24 +51,6 @@
                 <p v-else style="color: gray;">
                     You can't send messages in a chat you've left. Click "Join" to rejoin.
                 </p>
-
-                <form @submit.prevent="createGroupChat($graffitiSession.value)">
-                    <fieldset :disabled="sending">
-                        <input
-                            type="text"
-                            v-model="myGroupChat"
-                            placeholder="New Groupchat"
-                            ref="messageInput"
-                            v-focus
-                        />
-                        <input
-                            type="submit"
-                            :value="creating? 'Creating...' : 'Create'"
-                        />
-                    </fieldset>
-                </form>
-
-            </template>
 
 
             <h2>Messages</h2>
@@ -97,7 +81,7 @@
                     >
                         <strong>
                             {{ object.actor }}<span
-                                v-if="object.actor===$graffitiSession.value.actor"
+                                v-if="$graffitiSession.value && object.actor === $graffitiSession.value.actor"
                             >
                                 (you)</span
                             ></strong
@@ -120,14 +104,14 @@
                                 (edited)
                             </span>
                             <button
-                              v-if="object.actor === $graffitiSession.value.actor"
+                              v-if="$graffitiSession.value && object.actor === $graffitiSession.value.actor"
                               @click="startEditing(object)"
                             >
                             Edit
                             </button>
 
                             <button
-                              v-if="object.actor === $graffitiSession.value.actor"
+                              v-if="$graffitiSession.value && object.actor === $graffitiSession.value.actor"
                               @click="deleteMessage(object)"
                               style="color: red;"
                             >
@@ -158,9 +142,7 @@
                 class="group-chat" 
                 :class="{ selected: selectedChannel === chat.value.object.channel  }"
                 @click="selectedChannel = chat.value.object.channel">
-                    <!-- {{  chat.value?.object?.name || 'My Group Chat' }} -->
                 
-
                 <template v-if="editingGroupChatID === chat.url">
                     <input
                               type="text"
@@ -176,13 +158,13 @@
                         {{ chat.value.object.name }}
                     </span>
                     <button 
-                        v-if="chat.actor === $graffitiSession.value.actor"
+                        v-if="chat.actor === $graffitiSession.value?.actor"
                         @click="startGroupChatEditing(chat)">
                         Edit
                     </button>
 
                     <button 
-                        v-if="chat.actor === $graffitiSession.value.actor"
+                        v-if="chat.actor === $graffitiSession.value?.actor"
                         @click="deleteGroupChat(chat)"
                         style="color: red;"
                         >
@@ -215,12 +197,41 @@
             <template v-else>
                 <p style="color: gray;">You left the chat.</p>
             </template>
+        </template>
+        <!-- </template> -->
 
+        <template v-else>
+            <div class="login-screen">
+                <h1>Welcome to Roommate Match!</h1>
 
-           
-
-
-        </div>
+                <template v-if="loginStage === 'check'">
+                    <p>Enter your email to get started:</p>
+                    <input v-model="email" type="email" placeholder="Email" />
+                    <button @click="checkUser">Continue</button>
+                </template>
+                
+                <template v-else-if="loginStage === 'create'">
+                    <h2>Create Profile</h2>
+                    <input v-model="name" placeholder="Name" />
+                    <!-- <input v-model="email" placeholder="Email" disabled /> -->
+                    <input v-model="pronouns" placeholder="Pronouns" />
+                    <input v-model="password" type="password" placeholder="Password" />
+                    <button @click="createAccount">Create Account</button>
+                    <button @click="loginStage = 'check'">← Back</button>
+                </template>
+              
+                  <template v-else-if="loginStage === 'login'">
+                    <h2>Welcome back</h2>
+                    <!-- <input v-model="email" placeholder="Email" disabled /> -->
+                    <input v-model="enteredPassword" type="password" placeholder="Password" />
+                    <button @click="loginWithPassword">Log In</button>
+                    <button @click="loginStage = 'check'">← Back</button>
+                </template>
+               
+              </div>
+            
+        </template>
+    </div>
 
         <script src="index.js" type="module"></script>
     </body>
