@@ -24,6 +24,23 @@ fieldset {
     display: contents;
 }
 
+.direct-message {
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 6px;
+  }
+  
+.direct-message:hover {
+    background-color: #e0f7ff;
+  }
+
+.direct-message.selected {
+    background-color: #d0f0ff;
+    border-left: 4px solid #2196f3;
+    font-weight: bold;
+}
+
 .group-chat {
     padding: 0.5rem;
     cursor: pointer;
@@ -48,8 +65,58 @@ fieldset {
     justify-content: center;
     height: 100vh;
   }
-  .login-screen button {
+
+.login-screen button {
     padding: 0.5em 1em;
     margin-top: 1em;
     font-size: 1rem;
+  }
+
+.user-search {
+    margin: 1em 0;
+  }
+
+.user-search input {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
+.user-search ul {
+    list-style: none;
+    padding: 0;
+    max-width: 300px;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+.user-search li {
+    padding: 0.4em 0.6em;
+    border-bottom: 1px solid #eee;
+  }
+
+.user-search li:last-child {
+    border-bottom: none;
+  }
+
+.user-search em {
+    color: #666;
+    margin-left: 0.5em;
+    font-style: normal;
+  }
+  
+/* message animations */
+.message-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.3s forwards ease-out;
+  }
+  
+@keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
