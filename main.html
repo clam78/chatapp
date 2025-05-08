@@ -18,22 +18,40 @@
     </head>
     <body>
         <div id="app">
-            <template v-if="loginStage==='chat'">
-                <h1>Roommate Chatroom</h1>
 
+            <!-- 1) CHAT SCREEN ------------------------------------------------------- -->
+            <div v-if="loginStage==='chat'">
+                <h1>Roommate Chatroom</h1>
 
                 <button @click="logout">
                 Log Out
                 </button>
 
+                <div v-if="!selectedProfile">
                 <p v-if="$graffitiSession.value">
                     Logged in as: {{ $graffitiSession.value.actor }}
                 </p>
 
+                <div class="user-search">
+                    <input
+                      v-model="searchQuery"
+                      type="text"
+                      placeholder="Search users by name…"
+                    />
+                    <ul v-if="searchQuery">
+                      <li v-for="u in filteredUsers"
+                      :key="u.email"
+                        @click="viewProfile(u)"
+                        style="cursor: pointer;">
+                        <strong>{{ u.name }}</strong>
+                      </li>
+                      <li v-if="filteredUsers.length===0">No users found.</li>
+                    </ul>
+                </div>
 
                 <form 
                 v-if="selectedChannel && !leftGroupChats.includes(selectedChannel)"
-                    @submit.prevent="sendMessage($graffitiSession.value)">
+                    @submit.prevent="sendMessage()">
                     <fieldset :disabled="sending">
                         <input
                             type="text"
@@ -52,11 +70,12 @@
                     You can't send messages in a chat you've left. Click "Join" to rejoin.
                 </p>
 
-
+            <!-- ------------------------------------------------------------------------- -->
             <h2>Messages</h2>
 
             <button v-if="selectedChannel" @click="selectedChannel = null">← Back to Group List</button>
 
+            <!--start of this big section-->
             <graffiti-discover
                 v-if="selectedChannel"
                 v-slot="{ objects: messageObjects, isInitialPolling }"
@@ -71,23 +90,20 @@
                             }
                         }
                     }
-                }"
-            >
+                }">
                 <ul>
                     <li v-if="isInitialPolling">Loading...</li>
                     <li
                         v-for="object of messageObjects.sort((a, b) => b.value.published - a.value.published)"
                         :key="object.url"
-                    >
+                        class="message-item">
                         <strong>
                             {{ object.actor }}<span
                                 v-if="$graffitiSession.value && object.actor === $graffitiSession.value.actor"
-                            >
-                                (you)</span
-                            ></strong
-                        >: 
+                            > (you)</span></strong>: 
 
                     
+                        <!--start of the save / cancel functions-->
                         <template v-if="editingMessageID === object.url">
                             <input
                               type="text"
@@ -96,8 +112,10 @@
                             />
                             <button @click="submitEdit(object)">Save</button>
                             <button @click="editingMessageID = null">Cancel</button>
-                          </template>
+                        </template>
+                        <!--end of the save / cancel functions-->
                         
+                        <!-- start of edit, delete buttons-->
                         <template v-else>
                             {{ object.value.content }}
                             <span v-if="object.value.edited" style="color: gray; font-size: 0.9em;">
@@ -119,25 +137,42 @@
                             </button>
                             
                         </template>  
-
-                        
+                        <!-- end of edit, delete buttons-->
 
                     </li>
                 </ul>
             </graffiti-discover>
+            <!--end of this big section-->
+            <!-- ------------------------------------------------------------------------- -->
 
+            <!-- start of DM template -->
+            <h2>Direct Messages</h2>
+            <ul>
+                <li
+                    v-for="dm in directMessages"
+                    :key="dm.channel"
+                    class="direct-message"
+                    :class="{ selected: selectedChannel === dm.channel }"
+                    @click="selectedChannel = dm.channel">
+                    {{ dm.name }}
+                </li>
 
+                <li v-if="directMessages.length === 0" style="color: gray">
+                    No direct messages yet
+                </li>
 
+            </ul>
+            <!-- end of DM template -->
+
+            <!-- start of groupchat template -->
             <template v-if="!leftGroupChats.includes(selectedChannel)">
                 <graffiti-discover
                 v-slot="{objects: groupChatObjects }"
                 :channels="channels"
-                :schema="{
-                }"
-            >
+                :schema="{}">
             <h2>Dorm Chats</h2>
             <ul>
-                <li v-for="chat in groupChatObjects.filter(c => c.value?.object?.channel && c.value?.object?.name)" 
+                <li v-for="chat in groupChatObjects.filter(c => c.value?.object?.channel && c.value?.object?.name)"
                 :key="chat.url" 
                 class="group-chat" 
                 :class="{ selected: selectedChannel === chat.value.object.channel  }"
@@ -153,8 +188,9 @@
                             <button @click="editingGroupChatID = null">Cancel</button>
                 </template>
             
+                <!-- start of mini template for editing/deleting chat names -->
                 <template v-else>
-                    <span @click="selectedChannel = chat.value.object.channel">
+                    <span @click="selectedChannel = chat.value.object.name">
                         {{ chat.value.object.name }}
                     </span>
                     <button 
@@ -187,20 +223,46 @@
                         Leave
                     </button>
                 </template>
+                <!-- end of mini template for editing/deleting chat names -->
 
                 </li>
             </ul>
 
             </graffiti-discover>
             </template>
+            <!-- end of groupchat template -->
 
+            <!-- start of leaving chat -->
             <template v-else>
                 <p style="color: gray;">You left the chat.</p>
             </template>
-        </template>
-        <!-- </template> -->
+            <!-- end of leaving chat -->
 
-        <template v-else>
+
+            </div>
+             <!--end of selectedProfile  -->
+            <!-- 2) PROFILE SCREEN ------------------------------------------------------- -->
+            <div v-else class="profile-page">
+                <button @click="clearProfile()">← Back</button>
+                <h2>{{ selectedProfile.name }}’s Profile</h2>
+                <p><strong>Name:</strong> {{ selectedProfile.name }}</p>
+                <p><strong>Pronouns:</strong> {{ selectedProfile.pronouns }}</p>
+                <p><strong>Email:</strong> {{ selectedProfile.email }}</p>
+
+                <button class="dm-button"
+                    @click="startDirectMessage(selectedProfile)">
+                    Message {{ selectedProfile.name }}
+                </button>
+            </div>
+            <!-- PROFILE SCREEN ------------------------------------------------------- -->
+
+        </div> 
+        <!-- end of login-stage = chat -->
+        <!-- END OF CHAT SCREEN ------------------------------------------------------- -->
+
+
+        <!-- 3) LOGIN SCREEN ------------------------------------------------------- -->
+        <div v-else>
             <div class="login-screen">
                 <h1>Welcome to Roommate Match!</h1>
 
@@ -220,7 +282,7 @@
                     <button @click="loginStage = 'check'">← Back</button>
                 </template>
               
-                  <template v-else-if="loginStage === 'login'">
+                <template v-else-if="loginStage === 'login'">
                     <h2>Welcome back</h2>
                     <!-- <input v-model="email" placeholder="Email" disabled /> -->
                     <input v-model="enteredPassword" type="password" placeholder="Password" />
@@ -228,9 +290,11 @@
                     <button @click="loginStage = 'check'">← Back</button>
                 </template>
                
-              </div>
+            </div>
             
-        </template>
+        </div>
+        <!-- LOGIN SCREEN ------------------------------------------------------- -->
+
     </div>
 
         <script src="index.js" type="module"></script>
