@@ -5,26 +5,11 @@ import { GraffitiPlugin } from "@graffiti-garden/wrapper-vue";
 
 const raw = localStorage.getItem("graffitiIdentity");
 
-// const actor = raw ? JSON.parse(raw).actor : undefined;
 const identity = raw ? JSON.parse(raw) : undefined;
 const actor = identity?.actor;
 
-// let actor;
-// if (raw) {
-// //   try {
-//     // const { actor: a } = JSON.parse(raw);
-//     // if (typeof a === "string") actor = a;
-//     actor = JSON.parse(raw).actor;
-// //   } catch {}
-// }
-
-// const graffiti = new GraffitiLocal(actor);
 const graffiti = new GraffitiLocal(identity);
 
-// const rawIdentity = localStorage.getItem("graffitiIdentity");
-// const actorFromStorage = rawIdentity
-//   ? JSON.parse(rawIdentity).actor
-//   : null;
 const actorFromStorage = actor || null;
 
 const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
@@ -33,11 +18,12 @@ const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a 
 const app = createApp({
   data() {
     return {
+      channels: JSON.parse(localStorage.getItem("channels") || '["designftw"]'),
       myMessage: "",
       myGroupChat: "",
       sending: false,
       creating: false,
-      channels: ["designftw"],
+      // channels: ["designftw"],
       selectedChannel: null,
       editingMessageID: null,
       editedMessage: "",
@@ -56,7 +42,39 @@ const app = createApp({
       enteredPassword: "",
       currentUser: "",
       users: JSON.parse(localStorage.getItem("users") || '{}'), // all users
+
+      searchQuery: "",
+      selectedProfile: null,
     };
+  },
+
+  computed: {
+    filteredUsers() {
+      const q = this.searchQuery.trim().toLowerCase();
+      if (!q) return [];
+      return Object.values(this.users)
+        .filter(u => u.name.toLowerCase().includes(q));
+    },
+
+    directMessages() {
+      const session = this.$graffitiSession.value;
+      if (!session?.actor) return [];
+
+      const me = this.$graffitiSession.value.actor;
+      
+      return this.channels
+        .filter(ch => ch.startsWith("dm-"))
+        .map(ch => {
+          // channel is "dm-Alice-Bob" form
+          const [, a, b] = ch.split("-");
+          const other = a === me ? b : a;
+          return { channel: ch, name: other };
+        });
+    },
+  
+    dormChats() {
+      return this.channels.filter(ch => !ch.startsWith("dm-"));
+    }
   },
 
   methods: {
@@ -79,100 +97,75 @@ const app = createApp({
             pronouns: this.pronouns,
             password: this.password,
         };
-        // localStorage.setItem("users", JSON.stringify(this.users));
-        // this.currentUser = this.email;
-
-        // const identity = { actor: this.users[this.currentUser].name, credential: null };
-        // localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
-
-        // this.loginStage = "chat";
-
-        // console.log("Entered chat stage")
-
-        // this.selectedChannel = this.channels[0];
-        // // location.reload();
+        localStorage.setItem("users", JSON.stringify(this.users));
 
         const identity = { actor: this.users[this.email].name, credential: null };
-        // this.$graffiti.setSession(identity);
 
         localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
+        
+        this.$graffitiSession.value = identity;
 
-        // this.loginStage = "chat";
-        // // console.log("Entered chat stage")
-        // this.selectedChannel = this.channels[0];
-
-        location.reload();
+        this.loginStage = "chat";
+        this.selectedChannel = this.channels[0];
 
     },
-
-    // loginWithPassword() {
-    //     if (this.users[this.email]?.password === this.enteredPassword) {
-    //         this.currentUser = this.email;
-    //         this.startGraffitiSession()
-    //     } else {
-    //         alert("Incorrect password. Please try again.")
-    //     }
-    // },
 
     loginWithPassword() {
         if (this.users[this.email]?.password === this.enteredPassword) {
           this.currentUser = this.email;
 
           const identity = { actor: this.users[this.email].name, credential: null };
+          
           localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
 
-        //   this.$graffitiSession.value = identity;
+          this.$graffitiSession.value = identity;
 
-        //   this.loginStage = "chat";
-          
-        //   this.selectedChannel = this.channels[0];
-
-
-          location.reload();
-
+          this.loginStage = "chat";
+          this.selectedChannel = this.channels[0];
 
         } else {
           alert("Incorrect password.");
         }
       },
 
-    // startGraffitiSession() {
-    //     const identity = {
-    //         actor: this.users[this.currentUser].name,
-    //         credential: null
-    //       };
-    //       this.$graffiti.setSession(identity);
-      
-    //       localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
-    //       this.loginStage = "chat";
-    //       this.selectedChannel = this.channels[0];
-    // },
 
-    async sendMessage(session) {
-      if (!this.myMessage || !this.selectedChannel) return;
-
-      this.sending = true;
-
-      await this.$graffiti.put(
-        {
-          value: {
-            content: this.myMessage,
-            published: Date.now(),
-          },
-          channels: [this.selectedChannel],
-        },
-        session,
+    async sendMessage() {
+      console.log(
+        "sendMessage called →",
+        { msg: this.myMessage, channel: this.selectedChannel, session: this.$graffitiSession.value }
       );
-
-      this.sending = false;
-      this.myMessage = "";
-
-      // Refocus the input field after sending the message
-      await this.$nextTick();
-      this.$refs.messageInput.focus();
-      
+    
+      const session = this.$graffitiSession.value;
+      if (!session?.actor || !this.myMessage || !this.selectedChannel) {
+        console.warn("Aborting sendMessage; missing data");
+        return;
+      }
+    
+      this.sending = true;
+      try {
+        await this.$graffiti.put(
+          {
+            value: {
+              content: this.myMessage,
+              published: Date.now(),
+            },
+            channels: [this.selectedChannel],
+          },
+          session
+        );
+        // clear out the input on success
+        this.myMessage = "";
+        await this.$nextTick();
+        this.$refs.messageInput.focus();
+      } catch (err) {
+        console.error("Failed to send message:", err);
+        alert("Error sending message: " + err.message);
+      } finally {
+        this.sending = false;
+      }
     },
-
+    
+    
     async createGroupChat(session) {
       if (!this.myGroupChat) return;
 
@@ -184,7 +177,7 @@ const app = createApp({
           object: {
             type: 'Group Chat',
             name: this.myGroupChat,
-            channel: crypto.randomUUID(), // This creates a random string
+            channel: crypto.randomUUID(),
           }},
         channels: ["designftw"],
       }, session);
@@ -294,20 +287,10 @@ const app = createApp({
 
     login() {
         
-        // localStorage.setItem("graffitiIdentity", 
-        //   JSON.stringify({ actor: this.users[this.currentUser].name, credential: null })
-        // );
-
-        // this.loginStage = "chat";
-        // location.reload();
 
         const identity = { actor: this.users[this.currentUser].name, credential: null };
-        // this.$graffiti.setSession(identity);
 
         localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
-
-        // this.$graffitiSession.value = identity;
-
 
         this.loginStage = "chat";
         this.selectedChannel = this.channels[0];
@@ -315,32 +298,39 @@ const app = createApp({
         location.reload();
       },
 
-    // logout() {
-    //     this.$graffiti.logout(this.$graffitiSession.value);
-    //     localStorage.removeItem("graffitiIdentity");
-    //     this.currentUser = "";
-    //     this.loginStage = "check";
-    //     this.selectedChannel = null;
-    // },
+
 
     logout() {
 
-        // this.$graffitiSession.value = null; // might remove later
-
         localStorage.removeItem("graffitiIdentity");
-        // this.currentUser = "";
-        // this.loginStage = "check";
-        // this.selectedChannel = null;
-        // location.reload();
-        
-        
-        // this.loginStage = "check";
-        // this.selectedChannel = null;
-        // this.email = "";
-        // this.enteredPassword = "";
-
         location.reload();
       },
+    
+    viewProfile(user) {
+      this.selectedProfile = user;
+    },
+
+    clearProfile() {
+      this.selectedProfile = null;
+    },
+
+    startDirectMessage(user) {
+      // build a channel ID, same for both parties
+      const me   = this.$graffitiSession.value.actor;
+      const them = user.name;
+      const pair = [me, them].sort();
+      const dmChannel = `dm-${pair[0]}-${pair[1]}`;
+  
+      if (!this.channels.includes(dmChannel)) {
+        this.channels.push(dmChannel);
+        localStorage.setItem("channels", JSON.stringify(this.channels));
+      }
+      
+      this.selectedChannel = dmChannel;
+  
+      // go to chat
+      this.selectedProfile = null;
+    },
     
   },
 
@@ -349,23 +339,19 @@ const app = createApp({
     console.log("session.value:", this.$graffitiSession.value);
     console.log("actor:", this.$graffitiSession.value?.actor);
 
+    const raw = localStorage.getItem("graffitiIdentity");
+    if (raw) {
+      this.$graffitiSession.value = JSON.parse(raw);
+      this.loginStage = "chat";
+      this.selectedChannel = this.channels[0];
+    }
+
 
     if (actorFromStorage) {
         this.selectedChannel = this.channels[0];
       }
 
 
-    const raw = localStorage.getItem(leftKey);
-    this.leftGroupChats = raw ? JSON.parse(raw) : [];
-
-    // const stored = localStorage.getItem("leftGroupChats");
-    // if (stored) {
-    //   try {
-    //     this.leftGroupChats = JSON.parse(stored);
-    //   } catch (e) {
-    //     console.warn("Could not parse leftGroupChats from localStorage:", e);
-    //   }
-    // }
     if (this.$graffitiSession.value) {
         this.loginStage = "chat";              
         this.selectedChannel = this.channels[0]; 
