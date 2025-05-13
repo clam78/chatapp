@@ -10,15 +10,14 @@ const identity = raw ? JSON.parse(raw) : undefined;
 const actor = identity?.actor;
 
 // const graffiti = new GraffitiLocal(identity);
-const graffiti = new GraffitiRemote("https://pod.graffiti.garden");
+const graffiti = new GraffitiRemote("https://pod.graffiti.garden", identity);
 
 const actorFromStorage = actor || null;
 
 const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
 
 async function bootstrap() {
-  await graffiti.login({ idp: "https://solidcommunity.net" });
-
+  
 
 const app = createApp({
   data() {
@@ -144,10 +143,13 @@ const app = createApp({
 
         localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
         
-        this.$graffitiSession.value = identity;
+        // this.$graffitiSession.value = identity;
+        // this.loginStage = "create2";
 
+        await graffiti.login({ idp: "https://solidcommunity.net" });
+        this.$graffitiSession.value = identity;
         this.loginStage = "create2";
-        // this.selectedChannel = this.channels[0];
+        
 
     },
 
@@ -169,6 +171,8 @@ const app = createApp({
       this.$graffitiSession.value = identity;
 
       this.loginStage = "chat";
+
+
       this.selectedChannel = this.dormNames[0];
 
   
@@ -176,7 +180,6 @@ const app = createApp({
     
 
   },
-
 
 
     loginWithPassword() {
@@ -191,7 +194,12 @@ const app = createApp({
 
           this.$graffitiSession.value = identity;
 
+          // this.loginStage = "chat";
+
+          await graffiti.login({ idp: "https://solidcommunity.net" });
           this.loginStage = "chat";
+
+
           this.selectedChannel = this.dormNames[0];
 
         } else {
