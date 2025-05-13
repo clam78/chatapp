@@ -3,13 +3,14 @@ import { createApp } from "vue";
 import { GraffitiRemote } from "@graffiti-garden/implementation-remote";
 import { GraffitiPlugin } from "@graffiti-garden/wrapper-vue";
 
+
 const raw = localStorage.getItem("graffitiIdentity");
 
 const identity = raw ? JSON.parse(raw) : undefined;
 const actor = identity?.actor;
 
 // const graffiti = new GraffitiLocal(identity);
-const graffiti = new GraffitiRemote("https://pod.graffiticode.com", identity);
+const graffiti = new GraffitiRemote("https://pod.graffiti.garden", identity);
 
 const actorFromStorage = actor || null;
 
@@ -477,10 +478,6 @@ const app = createApp({
     //   }
 
 
-
-    console.log("🔍 dormNames =", this.dormNames);
-    console.log("🔍 initial selectedChannel =", this.selectedChannel);
-
     // 1) pull in who’s left which dorm
     this.leftGroupChats = JSON.parse(
       localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
@@ -499,5 +496,6 @@ const app = createApp({
   }
 });
 app.use(GraffitiPlugin, { graffiti });
+
 
 app.mount("#app");

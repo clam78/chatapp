@@ -171,14 +171,14 @@
                             <form v-if="selectedChannel && !leftGroupChats.includes(selectedChannel)"
                                 @submit.prevent="sendMessage()">
                                 <fieldset :disabled="sending">
-                                    <input
+                                    <textarea
                                         ref="messageInput"
                                         type="text"
                                         v-model="myMessage"
                                         placeholder="Message"
                                         @keydown.enter.prevent="sendMessage"
-                                        
-                                    />
+                                        rows = "4"
+                                    ></textarea>
                                     <input
                                         type="submit"
                                         :value="sending? 'Sending...' : 'Send'"
@@ -215,6 +215,12 @@
                                     }"
                                     :autopoll="true"
                                     v-slot="{ objects, isInitialPolling }">
+
+                                    <script>
+                                        console.log("🌱 DISCOVERED OBJECTS:", objects);
+                                    </script>
+
+
                                     <ul>
                                         <li v-if="isInitialPolling">Loading...</li>
                                         <li

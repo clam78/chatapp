@@ -213,6 +213,13 @@ fieldset {
   right: 1rem;
 }
 
+.sendmessage textarea {
+  width: 300px;
+  padding: 0.5em;
+  font-size: 1rem;
+  resize: vertical;
+}
+
 .login-error {
   color: rgb(201, 4, 4);
   margin-top: 0.5em;
