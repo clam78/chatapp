@@ -406,19 +406,39 @@ const app = createApp({
       this.selectedProfile = null;
     },
 
-    startDirectMessage(user) {
+    async startDirectMessage(user) {
       // build a channel ID, same for both parties
       const me = this.$graffitiSession.value.actor;
       const them = user.name;
       const pair = [me, them].sort();
       const dmChannel = `dm-${pair[0]}-${pair[1]}`;
   
-      if (!this.channels.includes(dmChannel)) {
-        this.channels.push(dmChannel);
-        localStorage.setItem("channels", JSON.stringify(this.channels));
-      }
-      
+      await this.$graffiti.put(
+        {
+          value: {
+            activity: "Create",
+            object: {
+              type: "GroupChat",
+              name: `${pair[0]} ↔ ${pair[1]}`, 
+              channel: dmChannel
+            }
+          },
+          channels: [ dmChannel ]
+        },
+        this.$graffitiSession.value
+      );
+
+      this.channels.push(dmChannel);
+      localStorage.setItem("channels", JSON.stringify(this.channels));
       this.selectedChannel = dmChannel;
+
+
+      // if (!this.channels.includes(dmChannel)) {
+      //   this.channels.push(dmChannel);
+      //   localStorage.setItem("channels", JSON.stringify(this.channels));
+      // }
+      
+      // this.selectedChannel = dmChannel;
   
       // go to chat
       this.selectedProfile = null;
