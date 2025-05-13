@@ -467,14 +467,26 @@ const app = createApp({
   },
 
   async mounted() {
-    // const stored = localStorage.getItem("graffitiIdentity");
-    // if (stored) {
-    //   const identity = JSON.parse(stored);
-    //   await graffiti.login({ idp: "https://solidcommunity.net" });
-    //   this.$graffitiSession.value = identity;
-    //   this.loginStage = "chat";
-    //   this.selectedChannel = this.dormNames[0];
-    // }
+    const stored = localStorage.getItem("graffitiIdentity");
+    if (stored) {
+      const identity = JSON.parse(stored);
+      await graffiti.login({ idp: "https://solidcommunity.net" });
+      this.$graffitiSession.value = identity;
+      // this.loginStage = "chat";
+      // this.selectedChannel = this.dormNames[0];
+      
+      const webId = identity.actor;
+      if (!this.users[webId]) {
+        this.loginStage = "create1";
+        return; 
+      }
+
+      this.loginStage = "chat";
+      this.selectedChannel = this.dormNames[0];
+      await this.seedDormChatsOnce();
+      this.loadLeftChatsFor(webId);
+    }
+    }
 
     if (!localStorage.getItem("dormChatsSeeded")) {
       for (const dorm of this.dormNames) {
