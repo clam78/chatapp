@@ -150,7 +150,6 @@ fieldset {
     margin: 0.5rem;
     padding: 0.5rem;
     border-radius: 0.5rem;
-    width: 100%;
     box-sizing: border-box;
     display: flex;
   }
@@ -199,6 +198,8 @@ fieldset {
 
 .chat-content ul {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .main form {
@@ -242,11 +243,15 @@ fieldset {
 
 .message-item.their-message {
   justify-content: flex-start;
+  background-color: #f1f1f1;
+  margin-right: auto;
   text-align: left;
 }
 
 .message-item.my-message {
   justify-content: flex-end;
+  background-color: #e6f0ff;
+  margin-left: auto;
   text-align: right;
   color: #0066cc;
 }
