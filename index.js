@@ -116,7 +116,7 @@ const app = createApp({
       }
     },
 
-    createAccount() {
+    async createAccount() {
         if (!this.name || !this.email || !this.password) {
             alert("Please fill in all fields.");
             return;
@@ -182,7 +182,7 @@ const app = createApp({
   },
 
 
-    loginWithPassword() {
+    async loginWithPassword() {
         if (this.users[this.email]?.password === this.enteredPassword) {
           this.loginError = "";
 
