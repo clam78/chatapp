@@ -596,7 +596,7 @@ const app = createApp({
     const stored = localStorage.getItem("graffitiIdentity");
     if (stored) {
       const identity = JSON.parse(stored);
-      await graffiti.login({ idp: "https://solidcommunity.net" });
+      // await graffiti.login({ idp: "https://solidcommunity.net" });
       
       this.$graffitiSession.value = identity;
 
