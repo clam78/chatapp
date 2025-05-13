@@ -200,7 +200,7 @@
                             <template v-if="selectedChannel && !leftGroupChats.includes(selectedChannel)">
                                 <graffiti-discover
                                     v-if="selectedChannel"
-                                    v-slot="{ objects: messageObjects, isInitialPolling }"
+
                                     :channels="[selectedChannel]"
                                     :schema="{
                                         properties: {
@@ -214,7 +214,7 @@
                                         }
                                     }"
                                     :autopoll="true"
-                                    v-slot="{ objects, isInitialPolling }">
+                                    v-slot="{ objects: messageObjects, isInitialPolling }">
 
 
                                     <ul>
