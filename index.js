@@ -177,8 +177,9 @@ const app = createApp({
 
         this.$graffitiSession.value = identity;
 
-        this.users[ identity.actor ] = { name: identity.actor };
-        localStorage.setItem("users", JSON.stringify(this.users));
+        // this.users[ identity.actor ] = { name: identity.actor };
+        // localStorage.setItem("users", JSON.stringify(this.users));
+
         // // new
         // const displayIdentity = {
         //   actor: this.name, 
@@ -263,8 +264,9 @@ const app = createApp({
     
     this.$graffitiSession.value = identity;
 
-    this.users[ identity.actor ] = { name: identity.actor };
-    localStorage.setItem("users", JSON.stringify(this.users));
+    // this.users[ identity.actor ] = { name: identity.actor };
+    // localStorage.setItem("users", JSON.stringify(this.users));
+
     // // new
     // const displayIdentity = {
     //   actor: this.name, 
@@ -325,8 +327,9 @@ const app = createApp({
         
         this.$graffitiSession.value = identity;
 
-        this.users[ identity.actor ] = { name: identity.actor };
-        localStorage.setItem("users", JSON.stringify(this.users));
+        // this.users[ identity.actor ] = { name: identity.actor };
+        // localStorage.setItem("users", JSON.stringify(this.users));
+
         //  // new
         //  const displayIdentity = {
         //   actor: this.name,
