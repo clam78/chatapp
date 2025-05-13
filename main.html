@@ -35,10 +35,9 @@
                     </button>
 
                     <p v-if="$graffitiSession.value">
-                        Logged in as: {{ $graffitiSession.value.actor }}
+                        Logged in as: {{  displayName || $graffitiSession.value.actor }}
                     </p>
                 </div>
-
 
 
                  <!--search bar-->

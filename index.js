@@ -70,6 +70,7 @@ const app = createApp({
         "Random",
         "Simmons"
       ],
+      displayName: localStorage.getItem("displayName") || "",
     };
   },
 
@@ -163,6 +164,9 @@ const app = createApp({
         if (!this.$graffitiSession.value?.actor) {
           await graffiti.login({ idp: "https://solidcommunity.net" });
         }
+
+        localStorage.setItem("displayName", this.name);
+        this.displayName = this.name;
 
         const session = this.$graffitiSession.value;
         localStorage.setItem(
@@ -307,6 +311,9 @@ const app = createApp({
         if (!this.$graffitiSession.value?.actor) {
           await graffiti.login({ idp: "https://solidcommunity.net" });
         }
+
+        localStorage.setItem("displayName", this.name);
+        this.displayName = this.name;
 
         const session = this.$graffitiSession.value;
         localStorage.setItem(
