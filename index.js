@@ -220,53 +220,53 @@ const app = createApp({
 
 
 
-  editcreateAccount() {
-    if (!this.name || !this.email || !this.password) {
-        alert("Please fill in all fields.");
-        return;
-    }
+//   editcreateAccount() {
+//     if (!this.name || !this.email || !this.password) {
+//         alert("Please fill in all fields.");
+//         return;
+//     }
 
-    if (this.currentUser) {
+//     if (this.currentUser) {
 
-      this.users[this.currentUser].name = this.name;
-      this.users[this.currentUser].pronouns = this.pronouns;
-      } else {
-      this.users[this.email] = {
-        name: this.name,
-        email: this.email,
-        pronouns: this.pronouns,
-        password: this.password
-      };
-      this.currentUser = this.email;
-      }
+//       this.users[this.currentUser].name = this.name;
+//       this.users[this.currentUser].pronouns = this.pronouns;
+//       } else {
+//       this.users[this.email] = {
+//         name: this.name,
+//         email: this.email,
+//         pronouns: this.pronouns,
+//         password: this.password
+//       };
+//       this.currentUser = this.email;
+//       }
 
 
-    localStorage.setItem("users", JSON.stringify(this.users));
+//     localStorage.setItem("users", JSON.stringify(this.users));
 
-    const identity = { actor: this.users[this.email].name, credential: null };
+//     const identity = { actor: this.users[this.email].name, credential: null };
 
-    localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
+//     localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
     
-    // this.$graffitiSession.value = identity;
-    // this.loginStage = "create2";
+//     // this.$graffitiSession.value = identity;
+//     // this.loginStage = "create2";
 
     
-    this.$graffitiSession.value = identity;
+//     this.$graffitiSession.value = identity;
 
-    this.users[ identity.actor ] = { name: identity.actor };
-    localStorage.setItem("users", JSON.stringify(this.users));
-    // // new
-    // const displayIdentity = {
-    //   actor: this.name, 
-    //   credential: null
-    // };
-    // this.$graffitiSession.value = displayIdentity;
-    //
+//     this.users[ identity.actor ] = { name: identity.actor };
+//     localStorage.setItem("users", JSON.stringify(this.users));
+//     // // new
+//     // const displayIdentity = {
+//     //   actor: this.name, 
+//     //   credential: null
+//     // };
+//     // this.$graffitiSession.value = displayIdentity;
+//     //
 
-    this.loginStage = "create2";
+//     this.loginStage = "create2";
     
 
-},
+// },
 
   
 
@@ -301,7 +301,7 @@ const app = createApp({
         if (!this.$graffitiSession.value?.actor) {
           await graffiti.login({ idp: "https://solidcommunity.net" });
         }
-        
+
         const session = this.$graffitiSession.value;
         localStorage.setItem(
           "loginIdentity",
@@ -589,8 +589,8 @@ const app = createApp({
       this.tidiness = user.tidiness || "";
       this.guests = user.guests || "";
       
-      this.loginStage = "editingcreate1";
-      console.log("entered editingcreate1 stage")
+      this.loginStage = "create1";
+      console.log("entered create1 stage")
     },
     
   },
