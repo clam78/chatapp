@@ -147,11 +147,12 @@ fieldset {
     transform: translateY(20px);
     animation: fadeInUp 0.3s forwards ease-out;
     max-width: 70%;
+    clear: both;
     margin: 0.5rem;
     padding: 0.5rem;
     border-radius: 0.5rem;
     box-sizing: border-box;
-    display: flex;
+    display: block;
   }
 
 
@@ -202,6 +203,12 @@ fieldset {
   margin: 0;
 }
 
+.chat-content ul::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 .main form {
   margin-top: auto;
   align-self: flex-end;
@@ -242,16 +249,14 @@ fieldset {
 
 
 .message-item.their-message {
-  justify-content: flex-start;
   background-color: #f1f1f1;
-  margin-right: auto;
+  float: left;
   text-align: left;
 }
 
 .message-item.my-message {
-  justify-content: flex-end;
   background-color: #e6f0ff;
-  margin-left: auto;
+  float: right;
   text-align: right;
   color: #0066cc;
 }
