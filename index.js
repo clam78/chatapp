@@ -30,7 +30,8 @@ const app = createApp({
       editingGroupChatID: null,
       editedGroupChat: "",
       leftGroupChats: JSON.parse(localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"),
-      loginStage: actorFromStorage ? "chat" : "check",
+      // loginStage: actorFromStorage ? "chat" : "check",
+      loginStage: "chat",
       
       name: "",
       email: "",
@@ -480,7 +481,7 @@ const app = createApp({
 
     console.log("🔍 dormNames =", this.dormNames);
     console.log("🔍 initial selectedChannel =", this.selectedChannel);
-    
+
     // 1) pull in who’s left which dorm
     this.leftGroupChats = JSON.parse(
       localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
