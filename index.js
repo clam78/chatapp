@@ -154,7 +154,9 @@ const app = createApp({
         // this.$graffitiSession.value = identity;
         // this.loginStage = "create2";
 
-        await graffiti.login({ idp: "https://solidcommunity.net" });
+        if (!this.$graffitiSession.value?.actor) {
+          await graffiti.login({ idp: "https://solidcommunity.net" });
+        }
 
         const session = this.$graffitiSession.value;
         localStorage.setItem(
@@ -296,8 +298,9 @@ const app = createApp({
 
 
         // this.loginStage = "chat";
-
-        await graffiti.login({ idp: "https://solidcommunity.net" });
+        if (!this.$graffitiSession.value?.actor) {
+          await graffiti.login({ idp: "https://solidcommunity.net" });
+        }
         
         const session = this.$graffitiSession.value;
         localStorage.setItem(
