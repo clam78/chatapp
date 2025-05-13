@@ -147,13 +147,21 @@ const app = createApp({
         // this.loginStage = "create2";
 
         await graffiti.login({ idp: "https://solidcommunity.net" });
-        
-        // new
-        const displayIdentity = {
-          actor: this.name, 
-          credential: null
-        };
-        this.$graffitiSession.value = displayIdentity;
+
+        const session = this.$graffitiSession.value;
+        localStorage.setItem(
+          "loginIdentity",
+          JSON.stringify({ webId: session.actor, credential: session.credential })
+        );
+        localStorage.setItem("displayName", JSON.stringify(this.name));
+
+        this.$graffitiSession.value = identity;
+        // // new
+        // const displayIdentity = {
+        //   actor: this.name, 
+        //   credential: null
+        // };
+        // this.$graffitiSession.value = displayIdentity;
         //
 
         this.loginStage = "create2";
@@ -204,14 +212,23 @@ const app = createApp({
           // this.loginStage = "chat";
 
           await graffiti.login({ idp: "https://solidcommunity.net" });
-
-           // new
-           const displayIdentity = {
-            actor: this.name,
-            credential: null
-            };
-            this.$graffitiSession.value = displayIdentity;
-            //
+          
+          const session = this.$graffitiSession.value;
+          localStorage.setItem(
+            "loginIdentity",
+            JSON.stringify({ webId: session.actor, credential: session.credential })
+          );
+          localStorage.setItem("displayName", JSON.stringify(this.name));
+          
+          
+          this.$graffitiSession.value = identity;
+          //  // new
+          //  const displayIdentity = {
+          //   actor: this.name,
+          //   credential: null
+          //   };
+          //   this.$graffitiSession.value = displayIdentity;
+          //   //
 
 
           this.loginStage = "chat";
