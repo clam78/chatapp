@@ -447,14 +447,14 @@ const app = createApp({
   },
 
   async mounted() {
-    const stored = localStorage.getItem("graffitiIdentity");
-    if (stored) {
-      const identity = JSON.parse(stored);
-      await graffiti.login({ idp: "https://solidcommunity.net" });
-      this.$graffitiSession.value = identity;
-      this.loginStage = "chat";
-      this.selectedChannel = this.dormNames[0];
-    }
+    // const stored = localStorage.getItem("graffitiIdentity");
+    // if (stored) {
+    //   const identity = JSON.parse(stored);
+    //   await graffiti.login({ idp: "https://solidcommunity.net" });
+    //   this.$graffitiSession.value = identity;
+    //   this.loginStage = "chat";
+    //   this.selectedChannel = this.dormNames[0];
+    // }
 
     if (!localStorage.getItem("dormChatsSeeded")) {
       for (const dorm of this.dormNames) {
@@ -475,17 +475,17 @@ const app = createApp({
       localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
     );
 
-    // const raw = localStorage.getItem("graffitiIdentity");
-    // if (raw) {
-    //   this.$graffitiSession.value = JSON.parse(raw);
-    //   this.loginStage = "chat";
+    const raw = localStorage.getItem("graffitiIdentity");
+    if (raw) {
+      this.$graffitiSession.value = JSON.parse(raw);
+      this.loginStage = "chat";
       
-    //   this.selectedChannel = this.dormNames[0];
-    // }
-    const actor = this.$graffitiSession.value?.actor;
-    this.leftGroupChats = JSON.parse(
-      localStorage.getItem(`leftGroupChats_${actor}`) || "[]"
-    );
+      this.selectedChannel = this.dormNames[0];
+    }
+    // const actor = this.$graffitiSession.value?.actor;
+    // this.leftGroupChats = JSON.parse(
+    //   localStorage.getItem(`leftGroupChats_${actor}`) || "[]"
+    // );
     
   }
 });
