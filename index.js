@@ -209,51 +209,126 @@ const app = createApp({
   },
 
 
-    async loginWithPassword() {
-        if (this.users[this.email]?.password === this.enteredPassword) {
-          this.loginError = "";
-
-          this.currentUser = this.email;
-
-          const identity = { actor: this.users[this.email].name, credential: null };
-          
-          localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
 
 
-          // this.loginStage = "chat";
-
-          await graffiti.login({ idp: "https://solidcommunity.net" });
-          
-          const session = this.$graffitiSession.value;
-          localStorage.setItem(
-            "loginIdentity",
-            JSON.stringify({ webId: session.actor, credential: session.credential })
-          );
-          localStorage.setItem("displayName", JSON.stringify(this.name));
-          
-          
-          this.$graffitiSession.value = identity;
-
-          this.users[ identity.actor ] = { name: identity.actor };
-          localStorage.setItem("users", JSON.stringify(this.users));
-          //  // new
-          //  const displayIdentity = {
-          //   actor: this.name,
-          //   credential: null
-          //   };
-          //   this.$graffitiSession.value = displayIdentity;
-          //   //
 
 
-          this.loginStage = "chat";
 
 
-          this.selectedChannel = this.dormNames[0];
 
-        } else {
-          this.loginError = "Incorrect password, please try again.";
-        }
-      },
+
+
+  editcreateAccount() {
+    if (!this.name || !this.email || !this.password) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    if (this.currentUser) {
+
+      this.users[this.currentUser].name = this.name;
+      this.users[this.currentUser].pronouns = this.pronouns;
+      } else {
+      this.users[this.email] = {
+        name: this.name,
+        email: this.email,
+        pronouns: this.pronouns,
+        password: this.password
+      };
+      this.currentUser = this.email;
+      }
+
+
+    localStorage.setItem("users", JSON.stringify(this.users));
+
+    const identity = { actor: this.users[this.email].name, credential: null };
+
+    localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
+    
+    // this.$graffitiSession.value = identity;
+    // this.loginStage = "create2";
+
+    
+    this.$graffitiSession.value = identity;
+
+    this.users[ identity.actor ] = { name: identity.actor };
+    localStorage.setItem("users", JSON.stringify(this.users));
+    // // new
+    // const displayIdentity = {
+    //   actor: this.name, 
+    //   credential: null
+    // };
+    // this.$graffitiSession.value = displayIdentity;
+    //
+
+    this.loginStage = "create2";
+    
+
+},
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  async loginWithPassword() {
+      if (this.users[this.email]?.password === this.enteredPassword) {
+        this.loginError = "";
+
+        this.currentUser = this.email;
+
+        const identity = { actor: this.users[this.email].name, credential: null };
+        
+        localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
+
+
+        // this.loginStage = "chat";
+
+        await graffiti.login({ idp: "https://solidcommunity.net" });
+        
+        const session = this.$graffitiSession.value;
+        localStorage.setItem(
+          "loginIdentity",
+          JSON.stringify({ webId: session.actor, credential: session.credential })
+        );
+        localStorage.setItem("displayName", JSON.stringify(this.name));
+        
+        
+        this.$graffitiSession.value = identity;
+
+        this.users[ identity.actor ] = { name: identity.actor };
+        localStorage.setItem("users", JSON.stringify(this.users));
+        //  // new
+        //  const displayIdentity = {
+        //   actor: this.name,
+        //   credential: null
+        //   };
+        //   this.$graffitiSession.value = displayIdentity;
+        //   //
+
+
+        this.loginStage = "chat";
+
+
+        this.selectedChannel = this.dormNames[0];
+
+      } else {
+        this.loginError = "Incorrect password, please try again.";
+      }
+    },
 
 
     async sendMessage() {
@@ -509,7 +584,7 @@ const app = createApp({
       this.tidiness = user.tidiness || "";
       this.guests = user.guests || "";
       
-      this.loginStage = "create1";
+      this.loginStage = "editingcreate1";
     },
     
   },

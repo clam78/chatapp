@@ -351,6 +351,34 @@
                         <button @click="createAccount2">Confirm</button>
                         <button @click="loginStage = 'create1'">← Back</button>
                     </div>
+
+                    <!--Edit Profile-->
+                    <div v-else-if="loginStage === 'editingcreate1'" class="login-panel">
+                        <h2>Edit Profile</h2>
+                        <input v-model="name" placeholder="Name" />
+                        <input v-model="pronouns" placeholder="Pronouns" />
+                        <input v-model="password" type="password" placeholder="Password"/>
+                        <button @click="editcreateAccount">Continue</button>
+                        <button @click="loginStage = 'check'">← Back</button>
+                    </div>
+
+                    <div v-else-if="loginStage === 'editingcreate2'" class="login-panel" id="profquestions">
+                        <h2>Edit Profile</h2>
+                        <p>Please answer the following questions:</p>
+
+                        <p>What's your sleep schedule like?</p>
+                        <input v-model="sleep"/>
+
+                        <p>What are your tidiness habits like?</p>
+                        <input v-model="tidiness"/>
+
+                        <p>What's your guest policy for the room?</p>
+                        <input v-model="guests"/>
+
+                        <button @click="createAccount2">Confirm</button>
+                        <button @click="loginStage = 'editingcreate1'">← Back</button>
+                    </div>
+
                 
                     <div v-else-if="loginStage === 'login'" class="login-panel">
                         <h2>Welcome back!</h2>
