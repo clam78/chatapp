@@ -155,9 +155,7 @@ fieldset {
     display: flex;
   }
 
-  .chat-content ul {
-    list-style: none;
-  }
+
   
 @keyframes fadeInUp {
     to {
@@ -197,6 +195,10 @@ fieldset {
   overflow-y: auto;
   padding: 1rem;
   padding-bottom: 4rem;
+}
+
+.chat-content ul {
+  list-style: none;
 }
 
 .main form {
