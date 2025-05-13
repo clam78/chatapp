@@ -19,7 +19,7 @@ const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a 
 const app = createApp({
   data() {
     return {
-      channels: JSON.parse(localStorage.getItem("channels") || '["designftw"]'),
+      channels: JSON.parse(localStorage.getItem("channels") || "[]"),
       myMessage: "",
       myGroupChat: "",
       sending: false,
@@ -29,7 +29,7 @@ const app = createApp({
       editedMessage: "",
       editingGroupChatID: null,
       editedGroupChat: "",
-      leftGroupChats: [],
+      leftGroupChats: JSON.parse(localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"),
       loginStage: actorFromStorage ? "chat" : "check",
       
       name: "",
@@ -47,6 +47,20 @@ const app = createApp({
 
       searchQuery: "",
       selectedProfile: null,
+
+      dormNames: [
+        "Baker",
+        "Burton Conner",
+        "East Campus",
+        "MacGregor",
+        "Maseeh",
+        "McCormick",
+        "New House",
+        "New Vassar",
+        "Next House",
+        "Random",
+        "Simmons"
+      ],
     };
   },
 
@@ -151,7 +165,7 @@ const app = createApp({
       this.$graffitiSession.value = identity;
 
       this.loginStage = "chat";
-      this.selectedChannel = this.channels[0];
+      this.selectedChannel = this.dormNames[0];
 
       this.selectedProfile = null;
 
@@ -172,7 +186,7 @@ const app = createApp({
           this.$graffitiSession.value = identity;
 
           this.loginStage = "chat";
-          this.selectedChannel = this.channels[0];
+          this.selectedChannel = this.dormNames[0];
 
         } else {
           this.loginError = "Incorrect password, please try again.";
@@ -219,25 +233,25 @@ const app = createApp({
     },
     
     
-    async createGroupChat(session) {
-      if (!this.myGroupChat) return;
+    // async createGroupChat(session) {
+    //   if (!this.myGroupChat) return;
 
-      this.creating = true;
+    //   this.creating = true;
 
-      await this.$graffiti.put({
-        value: { 
-          activity: 'Create',
-          object: {
-            type: 'Group Chat',
-            name: this.myGroupChat,
-            channel: crypto.randomUUID(),
-          }},
-        channels: ["designftw"],
-      }, session);
+    //   await this.$graffiti.put({
+    //     value: { 
+    //       activity: 'Create',
+    //       object: {
+    //         type: 'Group Chat',
+    //         name: this.myGroupChat,
+    //         channel: crypto.randomUUID(),
+    //       }},
+    //     channels: ["designftw"],
+    //   }, session);
 
-      this.myGroupChat = "";
-      this.creating = false;
-    },
+    //   this.myGroupChat = "";
+    //   this.creating = false;
+    // },
 
     startEditing(message) {
       this.editingMessageID = message.url;
@@ -316,26 +330,38 @@ const app = createApp({
     this.editedGroupChat = "";
     },
 
-    async deleteGroupChat(chat) {
-      const confirmDelete = confirm("Delete this group chat?");
-      if (!confirmDelete) return;
+    // async deleteGroupChat(chat) {
+    //   const confirmDelete = confirm("Delete this group chat?");
+    //   if (!confirmDelete) return;
 
-      await this.$graffiti.delete(chat, this.$graffitiSession.value);
+    //   await this.$graffiti.delete(chat, this.$graffitiSession.value);
+    // },
+
+    // leaveGroupChat(chat) {
+    //   const channel = chat.value.object.channel;
+    //   if (!this.leftGroupChats.includes(channel)) {
+    //     this.leftGroupChats.push(channel);
+    //   }
+    //   localStorage.setItem(leftKey, JSON.stringify(this.leftGroupChats));
+
+    // },
+
+    // joinGroupChat(chat) {
+    //   const channel = chat.value.object.channel;
+    //   this.leftGroupChats = this.leftGroupChats.filter(c => c !== channel);
+    //   localStorage.setItem(leftKey, JSON.stringify(this.leftGroupChats)); // saves it 
+    // },
+
+    joinGroupChat(chat) {
+      this.leftGroupChats = this.leftGroupChats.filter(c => c !== chat);
+      localStorage.setItem(leftKey, JSON.stringify(this.leftGroupChats));
     },
 
     leaveGroupChat(chat) {
-      const channel = chat.value.object.channel;
-      if (!this.leftGroupChats.includes(channel)) {
-        this.leftGroupChats.push(channel);
+      if (!this.leftGroupChats.includes(chat)) {
+        this.leftGroupChats.push(chat);
+        localStorage.setItem(leftKey, JSON.stringify(this.leftGroupChats));
       }
-      localStorage.setItem(leftKey, JSON.stringify(this.leftGroupChats));
-
-    },
-
-    joinGroupChat(chat) {
-      const channel = chat.value.object.channel;
-      this.leftGroupChats = this.leftGroupChats.filter(c => c !== channel);
-      localStorage.setItem(leftKey, JSON.stringify(this.leftGroupChats)); // saves it 
     },
 
     login() {
@@ -345,7 +371,7 @@ const app = createApp({
       localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
 
       this.loginStage = "chat";
-      this.selectedChannel = this.channels[0];
+      this.selectedChannel = this.dormNames[0];
 
       location.reload();
       },
@@ -408,27 +434,63 @@ const app = createApp({
   },
 
   mounted() {
-    console.log("session ref:", this.$graffitiSession);
-    console.log("session.value:", this.$graffitiSession.value);
-    console.log("actor:", this.$graffitiSession.value?.actor);
+    // this.leftGroupChats = JSON.parse(
+    //   localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
+    // );
 
+    // const raw = localStorage.getItem("graffitiIdentity");
+    // if (raw) {
+    //   this.$graffitiSession.value = JSON.parse(raw);
+    //   this.loginStage = "chat";
+    //   this.selectedChannel = this.channels[0];
+    // }
+
+
+    // if (actorFromStorage) {
+    //     this.selectedChannel = this.channels[0];
+    //   }
+
+
+    // if (this.$graffitiSession.value) {
+    //     this.loginStage = "chat";              
+    //     this.selectedChannel = this.channels[0]; 
+    //   }
+    
+
+    // // adding group chats
+    // if (!localStorage.getItem("dormChatsSeeded")) {
+    //   this.channels.push("Baker");
+    //   this.channels.push("Burton Conner");
+    //   this.channels.push("East Campus");
+    //   this.channels.push("MacGregor"); 
+    //   this.channels.push("Maseeh");
+    //   this.channels.push("McCormick"); 
+    //   this.channels.push("New House");
+    //   this.channels.push("New Vassar");
+    //   this.channels.push("Next House");
+    //   this.channels.push("Random"); 
+    //   this.channels.push("Simmons"); 
+         
+    //   localStorage.setItem("channels", JSON.stringify(this.channels));
+  
+    //   localStorage.setItem("dormChatsSeeded", "true");
+    //   }
+
+    // 1) pull in who’s left which dorm
+    this.leftGroupChats = JSON.parse(
+      localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
+    );
+
+    // 2) load saved login and switch to chat
     const raw = localStorage.getItem("graffitiIdentity");
     if (raw) {
       this.$graffitiSession.value = JSON.parse(raw);
       this.loginStage = "chat";
-      this.selectedChannel = this.channels[0];
+      
+      // 3) default to the first dorm in your fixed list
+      this.selectedChannel = this.dormNames[0];
     }
-
-
-    if (actorFromStorage) {
-        this.selectedChannel = this.channels[0];
-      }
-
-
-    if (this.$graffitiSession.value) {
-        this.loginStage = "chat";              
-        this.selectedChannel = this.channels[0]; 
-      }
+    
   }
 });
 app.use(GraffitiPlugin, { graffiti });

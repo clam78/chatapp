@@ -21,6 +21,8 @@
 
             <!-- 1) CHAT  ------------------------------------------------------- -->
             <template v-if="loginStage==='chat'">
+                <pre>selectedChannel = {{ selectedChannel }}</pre>
+                <pre>dormNames       = {{ dormNames }}</pre>
 
                 <div class="title">
                     <h1>Roommate Chat</h1>
@@ -37,6 +39,8 @@
                         Logged in as: {{ $graffitiSession.value.actor }}
                     </p>
                 </div>
+
+
 
                  <!--search bar-->
                  <div class="user-search">
@@ -84,19 +88,39 @@
 
                         <!-- start of groupchat template -->
                         <!-- <template v-if="!leftGroupChats.includes(selectedChannel)"> -->
-                            <graffiti-discover
+                            
+                            <!-- <graffiti-discover
                             v-slot="{objects: groupChatObjects }"
                             :channels="channels"
-                            :schema="{}">
+                            :schema="{}"> -->
+
                         <h2>Dorm Chats</h2>
                         <ul>
-                            <li v-for="chat in groupChatObjects.filter(c => c.value?.object?.channel && c.value?.object?.name)"
+                            <!-- <li v-for="chat in groupChatObjects.filter(c => c.value?.object?.channel && c.value?.object?.name)"
                             :key="chat.url" 
                             class="group-chat" 
                             :class="{ selected: selectedChannel === chat.value.object.channel  }"
                             @click="selectedChannel = chat.value.object.channel">
+                            {{ chat.value.object.name }}
+                             -->
                             
-                            <template v-if="editingGroupChatID === chat.url">
+                            <!-- <li
+                                v-for="ch in dormChats"
+                                :key="ch"
+                                class="group-chat"
+                                :class="{ selected: selectedChannel === ch }"
+                                @click="selectedChannel = ch">
+                                {{ ch }} -->
+                            <li
+                                v-for="d in dormNames"
+                                :key="d"
+                                class="group-chat"
+                                :class="{ selected: selectedChannel === d }"
+                                @click="selectedChannel = d"
+                                >
+                                {{ d }}
+                            
+                            <!-- <template v-if="editingGroupChatID === chat.url">
                                 <input
                                         type="text"
                                         v-model="editedGroupChat"
@@ -104,33 +128,35 @@
                                         />
                                         <button @click="submitGroupChatEdit(chat)">Save</button>
                                         <button @click="editingGroupChatID = null">Cancel</button>
-                            </template>
+                            </template> -->
                     
                             <!-- start of mini template for joining/leaving chats -->
-                            <template v-else>
-                                <span class="chat-name">
+                            
+                            <!-- <template v-else> -->
+                                <!-- <span class="chat-name">
                                     {{ chat.value.object.name }}
-                                </span>
+                                </span> -->
                                 <button
-                                    v-if="leftGroupChats.includes(chat.value.object.channel)"
-                                    @click="joinGroupChat(chat)"
+                                    v-if="leftGroupChats.includes(d)"
+                                    @click.stop="joinGroupChat(d)"
                                     style="color: rgb(27, 90, 5);">
                                     Join
                                 </button>
 
                                 <button 
-                                    v-if="!leftGroupChats.includes(chat.value.object.channel)"
-                                    @click="leaveGroupChat(chat)"
+                                    v-if="!leftGroupChats.includes(d)"
+                                    @click.stop="leaveGroupChat(d)"
                                     style="color: rgb(32, 7, 175);">
                                     Leave
                                 </button>
-                            </template>
+                            <!-- </template> -->
                             <!-- end of mini template for joining/leaving chats -->
 
                             </li>
                         </ul>
 
-                        </graffiti-discover>
+                        <!-- </graffiti-discover> -->
+
                         <!-- </template> -->
                     </div> <!--END of left sidebar-->
 
