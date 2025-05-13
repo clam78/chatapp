@@ -476,6 +476,11 @@ const app = createApp({
     //   localStorage.setItem("dormChatsSeeded", "true");
     //   }
 
+
+
+    console.log("🔍 dormNames =", this.dormNames);
+    console.log("🔍 initial selectedChannel =", this.selectedChannel);
+    
     // 1) pull in who’s left which dorm
     this.leftGroupChats = JSON.parse(
       localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
