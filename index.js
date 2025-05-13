@@ -86,13 +86,18 @@ const app = createApp({
           if (!ch.startsWith("dm-")) return false;
           const [, a, b] = ch.split("-");
           return a === me || b === me;
+
         })
         
           .map(ch => {
           // channel is "dm-Alice-Bob" form
           const [, a, b] = ch.split("-");
           const other = a === me ? b : a;
-          return { channel: ch, name: other };
+          // return { channel: ch, name: other };
+          return {
+                  channel: ch,
+                  name: this.users[other]?.name || other.split("/").pop()
+                };
         });
     },
   
@@ -156,6 +161,9 @@ const app = createApp({
         localStorage.setItem("displayName", JSON.stringify(this.name));
 
         this.$graffitiSession.value = identity;
+
+        this.users[ identity.actor ] = { name: identity.actor };
+        localStorage.setItem("users", JSON.stringify(this.users));
         // // new
         // const displayIdentity = {
         //   actor: this.name, 
@@ -222,6 +230,9 @@ const app = createApp({
           
           
           this.$graffitiSession.value = identity;
+
+          this.users[ identity.actor ] = { name: identity.actor };
+          localStorage.setItem("users", JSON.stringify(this.users));
           //  // new
           //  const displayIdentity = {
           //   actor: this.name,
