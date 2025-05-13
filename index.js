@@ -17,7 +17,6 @@ const actorFromStorage = actor || null;
 const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
 
 async function bootstrap() {
-  localStorage.removeItem("users");
   const rawIdentity = localStorage.getItem("graffitiIdentity");
   if (rawIdentity) {
     const identity = JSON.parse(rawIdentity);
