@@ -569,6 +569,8 @@ const app = createApp({
 
     editProfile() {
 
+      console.log("Edit profile called")
+
       const actor = this.$graffitiSession.value?.actor;
       if (!actor) return;
   
@@ -585,6 +587,7 @@ const app = createApp({
       this.guests = user.guests || "";
       
       this.loginStage = "editingcreate1";
+      console.log("entered editingcreate1 stage")
     },
     
   },
