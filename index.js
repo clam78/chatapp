@@ -23,23 +23,23 @@ const app = createApp({
       myGroupChat: "",
       sending: false,
       creating: false,
-      // channels: ["designftw"],
       selectedChannel: null,
       editingMessageID: null,
       editedMessage: "",
       editingGroupChatID: null,
       editedGroupChat: "",
       leftGroupChats: [],
-      
       loginStage: actorFromStorage ? "chat" : "check",
-    //   selectedChannel: actorFromStorage ? this.channels[0] : null,
-
-    //   loginStage: "check",
+      
       name: "",
       email: "",
       pronouns: "",
       password: "",
+      sleep: "",
+      tidiness: "",
+      guests: "",
       enteredPassword: "",
+      loginError: "",
       currentUser: "",
       users: JSON.parse(localStorage.getItem("users") || '{}'), // all users
 
@@ -63,8 +63,13 @@ const app = createApp({
       const me = this.$graffitiSession.value.actor;
       
       return this.channels
-        .filter(ch => ch.startsWith("dm-"))
-        .map(ch => {
+        .filter(ch => {
+          if (!ch.startsWith("dm-")) return false;
+          const [, a, b] = ch.split("-");
+          return a === me || b === me;
+        })
+        
+          .map(ch => {
           // channel is "dm-Alice-Bob" form
           const [, a, b] = ch.split("-");
           const other = a === me ? b : a;
@@ -82,7 +87,7 @@ const app = createApp({
         if (this.email in this.users) {
           this.loginStage = 'login'; // user exists
         } else {
-          this.loginStage = 'create'; // new user
+          this.loginStage = 'create1'; // new user
         }
     },
 
@@ -91,12 +96,22 @@ const app = createApp({
             alert("Please fill in all fields.");
             return;
         }
-        this.users[this.email] = {
+
+        if (this.currentUser) {
+
+          this.users[this.currentUser].name = this.name;
+          this.users[this.currentUser].pronouns = this.pronouns;
+          } else {
+          this.users[this.email] = {
             name: this.name,
             email: this.email,
             pronouns: this.pronouns,
-            password: this.password,
-        };
+            password: this.password
+          };
+          this.currentUser = this.email;
+          }
+
+
         localStorage.setItem("users", JSON.stringify(this.users));
 
         const identity = { actor: this.users[this.email].name, credential: null };
@@ -105,13 +120,50 @@ const app = createApp({
         
         this.$graffitiSession.value = identity;
 
-        this.loginStage = "chat";
-        this.selectedChannel = this.channels[0];
+        this.loginStage = "create2";
+        // this.selectedChannel = this.channels[0];
 
     },
 
+    createAccount2() {
+
+      // this.users[this.email] = {
+      //     name: this.name,
+      //     email: this.email,
+      //     pronouns: this.pronouns,
+      //     password: this.password,
+      //     sleep: this.sleep,
+      //     tidiness: this.tidiness,
+      //     guests: this.guests,
+      // };
+      const key = this.currentUser;
+      Object.assign(this.users[key], {
+        sleep: this.sleep,
+        tidiness: this.tidiness,
+        guests: this.guests
+      });
+
+      localStorage.setItem("users", JSON.stringify(this.users));
+
+      const identity = { actor: this.users[this.email].name, credential: null };
+
+      localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
+      
+      this.$graffitiSession.value = identity;
+
+      this.loginStage = "chat";
+      this.selectedChannel = this.channels[0];
+
+      this.selectedProfile = null;
+
+  },
+
+
+
     loginWithPassword() {
         if (this.users[this.email]?.password === this.enteredPassword) {
+          this.loginError = "";
+
           this.currentUser = this.email;
 
           const identity = { actor: this.users[this.email].name, credential: null };
@@ -124,7 +176,8 @@ const app = createApp({
           this.selectedChannel = this.channels[0];
 
         } else {
-          alert("Incorrect password.");
+          this.loginError = "Incorrect password, please try again.";
+          console.log("hey")
         }
       },
 
@@ -153,15 +206,17 @@ const app = createApp({
           },
           session
         );
-        // clear out the input on success
-        this.myMessage = "";
-        await this.$nextTick();
-        this.$refs.messageInput.focus();
+        
       } catch (err) {
         console.error("Failed to send message:", err);
         alert("Error sending message: " + err.message);
       } finally {
+        // clear out the input on success
+        this.myMessage = "";
         this.sending = false;
+        await this.$nextTick();
+        this.$refs.messageInput.focus();
+
       }
     },
     
@@ -287,15 +342,14 @@ const app = createApp({
 
     login() {
         
+      const identity = { actor: this.users[this.currentUser].name, credential: null };
 
-        const identity = { actor: this.users[this.currentUser].name, credential: null };
+      localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
 
-        localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
+      this.loginStage = "chat";
+      this.selectedChannel = this.channels[0];
 
-        this.loginStage = "chat";
-        this.selectedChannel = this.channels[0];
-
-        location.reload();
+      location.reload();
       },
 
 
@@ -316,7 +370,7 @@ const app = createApp({
 
     startDirectMessage(user) {
       // build a channel ID, same for both parties
-      const me   = this.$graffitiSession.value.actor;
+      const me = this.$graffitiSession.value.actor;
       const them = user.name;
       const pair = [me, them].sort();
       const dmChannel = `dm-${pair[0]}-${pair[1]}`;
@@ -331,6 +385,27 @@ const app = createApp({
       // go to chat
       this.selectedProfile = null;
     },
+
+    editProfile() {
+
+      const actor = this.$graffitiSession.value?.actor;
+      if (!actor) return;
+  
+      const key = Object.keys(this.users).find(email => this.users[email].name === actor);
+      const user = key && this.users[key];
+      if (!user) return;
+      
+      this.email = key;
+      this.name = user.name;
+      this.pronouns = user.pronouns || "";
+      this.password = user.password || "";
+      this.sleep = user.sleep || "";
+      this.tidiness = user.tidiness || "";
+      this.guests = user.guests || "";
+      
+      this.loginStage = "create1";
+    },
+  
     
   },
 
