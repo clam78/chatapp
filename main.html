@@ -212,7 +212,9 @@
                                                 }
                                             }
                                         }
-                                    }">
+                                    }"
+                                    :autopoll="true"
+                                    v-slot="{ objects, isInitialPolling }">
                                     <ul>
                                         <li v-if="isInitialPolling">Loading...</li>
                                         <li
