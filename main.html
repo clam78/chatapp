@@ -226,11 +226,14 @@
                                         <li
                                             v-for="object of messageObjects.sort((a, b) => a.value.published - b.value.published)"
                                             :key="object.url"
-                                            class="message-item">
+                                            class="message-item"
+                                            :class="{
+                                                'my-message': object.actor === $graffitiSession.value.actor,
+                                                'their-message': object.actor !== $graffitiSession.value.actor
+                                              }">
                                             <strong>
-                                                {{ object.actor }}<span
-                                                    v-if="$graffitiSession.value && object.actor === $graffitiSession.value.actor"
-                                                > (you)</span></strong>: 
+                                                {{ object.actor }}
+                                            </strong>: 
 
                                             <!--start of the save / cancel functions-->
                                             <template v-if="editingMessageID === object.url">

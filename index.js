@@ -430,66 +430,20 @@ const app = createApp({
       
       this.loginStage = "create1";
     },
-  
     
   },
 
   mounted() {
-    // this.leftGroupChats = JSON.parse(
-    //   localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
-    // );
 
-    // const raw = localStorage.getItem("graffitiIdentity");
-    // if (raw) {
-    //   this.$graffitiSession.value = JSON.parse(raw);
-    //   this.loginStage = "chat";
-    //   this.selectedChannel = this.channels[0];
-    // }
-
-
-    // if (actorFromStorage) {
-    //     this.selectedChannel = this.channels[0];
-    //   }
-
-
-    // if (this.$graffitiSession.value) {
-    //     this.loginStage = "chat";              
-    //     this.selectedChannel = this.channels[0]; 
-    //   }
-    
-
-    // // adding group chats
-    // if (!localStorage.getItem("dormChatsSeeded")) {
-    //   this.channels.push("Baker");
-    //   this.channels.push("Burton Conner");
-    //   this.channels.push("East Campus");
-    //   this.channels.push("MacGregor"); 
-    //   this.channels.push("Maseeh");
-    //   this.channels.push("McCormick"); 
-    //   this.channels.push("New House");
-    //   this.channels.push("New Vassar");
-    //   this.channels.push("Next House");
-    //   this.channels.push("Random"); 
-    //   this.channels.push("Simmons"); 
-         
-    //   localStorage.setItem("channels", JSON.stringify(this.channels));
-  
-    //   localStorage.setItem("dormChatsSeeded", "true");
-    //   }
-
-
-    // 1) pull in who’s left which dorm
     this.leftGroupChats = JSON.parse(
       localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
     );
 
-    // 2) load saved login and switch to chat
     const raw = localStorage.getItem("graffitiIdentity");
     if (raw) {
       this.$graffitiSession.value = JSON.parse(raw);
       this.loginStage = "chat";
       
-      // 3) default to the first dorm in your fixed list
       this.selectedChannel = this.dormNames[0];
     }
     

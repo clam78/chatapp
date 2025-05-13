@@ -225,3 +225,23 @@ fieldset {
   margin-top: 0.5em;
   font-size: 0.9em;
 }
+
+.message-item {
+  max-width: 70%;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.their-message {
+  text-align: left;
+  background-color: #f1f1f1;
+  margin-right: auto;
+}
+
+.my-message {
+  text-align: right;
+  color: #0066cc;
+  background-color: #e6f0ff;
+  margin-left: auto; 
+}
