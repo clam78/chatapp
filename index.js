@@ -30,8 +30,7 @@ const app = createApp({
       editingGroupChatID: null,
       editedGroupChat: "",
       leftGroupChats: JSON.parse(localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"),
-      // loginStage: actorFromStorage ? "chat" : "check",
-      loginStage: "chat",
+      loginStage: actorFromStorage ? "chat" : "check",
       
       name: "",
       email: "",
