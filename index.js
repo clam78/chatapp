@@ -10,11 +10,14 @@ const identity = raw ? JSON.parse(raw) : undefined;
 const actor = identity?.actor;
 
 // const graffiti = new GraffitiLocal(identity);
-const graffiti = new GraffitiRemote("https://pod.graffiti.garden", identity);
+const graffiti = new GraffitiRemote("https://pod.graffiti.garden");
 
 const actorFromStorage = actor || null;
 
 const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
+
+async function bootstrap() {
+  await graffiti.login({ idp: "https://solidcommunity.net" });
 
 
 const app = createApp({
@@ -168,7 +171,9 @@ const app = createApp({
       this.loginStage = "chat";
       this.selectedChannel = this.dormNames[0];
 
+  
       this.selectedProfile = null;
+    
 
   },
 
@@ -433,7 +438,22 @@ const app = createApp({
     
   },
 
-  mounted() {
+  async mounted() {
+
+    if (!localStorage.getItem("dormChatsSeeded")) {
+      for (const dorm of this.dormNames) {
+        await this.$graffiti.put({
+          value: {
+            activity: "Create",
+            object: { type: "GroupChat", name: dorm, channel: dorm }
+          },
+          channels: [dorm]
+        }, this.$graffitiSession.value);
+        this.channels.push(dorm);
+      }
+      localStorage.setItem("channels", JSON.stringify(this.channels));
+      localStorage.setItem("dormChatsSeeded", "true");
+    }
 
     this.leftGroupChats = JSON.parse(
       localStorage.getItem(`leftGroupChats_${actorFromStorage}`) || "[]"
@@ -453,3 +473,6 @@ app.use(GraffitiPlugin, { graffiti });
 
 
 app.mount("#app");
+}
+
+bootstrap();
