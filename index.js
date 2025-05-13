@@ -220,53 +220,53 @@ const app = createApp({
 
 
 
-//   editcreateAccount() {
-//     if (!this.name || !this.email || !this.password) {
-//         alert("Please fill in all fields.");
-//         return;
-//     }
+  editcreateAccount() {
+    if (!this.name || !this.email || !this.password) {
+        alert("Please fill in all fields.");
+        return;
+    }
 
-//     if (this.currentUser) {
+    if (this.currentUser) {
 
-//       this.users[this.currentUser].name = this.name;
-//       this.users[this.currentUser].pronouns = this.pronouns;
-//       } else {
-//       this.users[this.email] = {
-//         name: this.name,
-//         email: this.email,
-//         pronouns: this.pronouns,
-//         password: this.password
-//       };
-//       this.currentUser = this.email;
-//       }
+      this.users[this.currentUser].name = this.name;
+      this.users[this.currentUser].pronouns = this.pronouns;
+      } else {
+      this.users[this.email] = {
+        name: this.name,
+        email: this.email,
+        pronouns: this.pronouns,
+        password: this.password
+      };
+      this.currentUser = this.email;
+      }
 
 
-//     localStorage.setItem("users", JSON.stringify(this.users));
+    localStorage.setItem("users", JSON.stringify(this.users));
 
-//     const identity = { actor: this.users[this.email].name, credential: null };
+    const identity = { actor: this.users[this.email].name, credential: null };
 
-//     localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
+    localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
     
-//     // this.$graffitiSession.value = identity;
-//     // this.loginStage = "create2";
+    // this.$graffitiSession.value = identity;
+    // this.loginStage = "create2";
 
     
-//     this.$graffitiSession.value = identity;
+    this.$graffitiSession.value = identity;
 
-//     this.users[ identity.actor ] = { name: identity.actor };
-//     localStorage.setItem("users", JSON.stringify(this.users));
-//     // // new
-//     // const displayIdentity = {
-//     //   actor: this.name, 
-//     //   credential: null
-//     // };
-//     // this.$graffitiSession.value = displayIdentity;
-//     //
+    this.users[ identity.actor ] = { name: identity.actor };
+    localStorage.setItem("users", JSON.stringify(this.users));
+    // // new
+    // const displayIdentity = {
+    //   actor: this.name, 
+    //   credential: null
+    // };
+    // this.$graffitiSession.value = displayIdentity;
+    //
 
-//     this.loginStage = "create2";
+    this.loginStage = "editingcreate2";
     
 
-// },
+},
 
   
 
@@ -574,13 +574,36 @@ const app = createApp({
 
       console.log("Edit profile called")
 
-      const actor = this.$graffitiSession.value?.actor;
-      if (!actor) return;
-      console.log("made it past actor")
+      // const actor = this.$graffitiSession.value?.actor;
+      // if (!actor) return;
+
+      const raw = localStorage.getItem("graffitiIdentity");
+      if (!raw) {
+        console.warn("no identity found in localStorage");
+        return;
+      }
+      const { actor } = JSON.parse(raw);
+      if (!actor) {
+        console.warn("identity.actor is empty");
+        return;
+      }
+
+      const key = Object
+      .entries(this.users)
+      .find(([email, u]) => u.name === actor)?.[0];
+      if (!key) {
+        console.warn("couldn't find a user record for", actor);
+        return;
+      }
+
+      this.currentUser = key
+
+      const user = this.users[key];
+
   
-      const key = Object.keys(this.users).find(email => this.users[email].name === actor);
-      const user = key && this.users[key];
-      if (!user) return;
+      // const key = Object.keys(this.users).find(email => this.users[email].name === actor);
+      // const user = key && this.users[key];
+      // if (!user) return;
       
       this.email = key;
       this.name = user.name;
@@ -590,8 +613,8 @@ const app = createApp({
       this.tidiness = user.tidiness || "";
       this.guests = user.guests || "";
       
-      this.loginStage = "create1";
-      console.log("entered create1 stage")
+      this.loginStage = "editingcreate1";
+      console.log("entered editingcreate1 stage")
     },
     
   },
