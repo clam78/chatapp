@@ -71,8 +71,11 @@ const app = createApp({
     filteredUsers() {
       const q = this.searchQuery.trim().toLowerCase();
       if (!q) return [];
-      return Object.values(this.users)
-        .filter(u => u.name.toLowerCase().includes(q));
+      // return Object.values(this.users)
+      //   .filter(u => u.name.toLowerCase().includes(q));
+      return Object.entries(this.users)
+      .map(([id,u]) => ({ id, ...u }))
+      .filter(u => u.name.toLowerCase().includes(q));
     },
 
     directMessages() {

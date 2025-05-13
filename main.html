@@ -49,12 +49,22 @@
                     placeholder="Search users by name…"
                     />
                     <ul v-if="searchQuery">
-                    <li v-for="u in filteredUsers"
+
+                    <!-- <li v-for="u in filteredUsers"
                     :key="u.email"
                         @click="viewProfile(u)"
                         style="cursor: pointer;">
                         <strong>{{ u.name }}</strong>
+                    </li> -->
+
+                    <li v-for="u in filteredUsers"
+                       :key="u.id"
+                       @click="startDirectMessage(u); searchQuery='';"
+                       style="cursor: pointer;">
+                    <strong>{{ u.name }}</strong>
                     </li>
+
+
                     <li v-if="filteredUsers.length===0">No users found.</li>
                     </ul>
                 </div>
