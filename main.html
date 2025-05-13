@@ -253,12 +253,11 @@
                     <div v-else class="profile-page">
                         <button @click="clearProfile()">← Back</button>
                         <h2>{{ selectedProfile.name }}’s Profile</h2>
-                        <p><strong>Name:</strong> {{ selectedProfile.name }}</p>
                         <p><strong>Pronouns:</strong> {{ selectedProfile.pronouns }}</p>
-                        <p><strong>Sleep Habits:</strong> {{ selectedProfile.sleep }}</p>
-                        <p><strong>Tidiness Habits:</strong> {{ selectedProfile.tidiness }}</p>
-                        <p><strong>Guest Policy:</strong> {{ selectedProfile.guests }}</p>
-                        <p><strong>Email:</strong> {{ selectedProfile.email }}</p>
+                        <p><strong>Sleep Habits 🛌:</strong> {{ selectedProfile.sleep }}</p>
+                        <p><strong>Tidiness Habits ✨:</strong> {{ selectedProfile.tidiness }}</p>
+                        <p><strong>Guest Policy 👥:</strong> {{ selectedProfile.guests }}</p>
+                        <p><strong>Email 📧:</strong> {{ selectedProfile.email }}</p>
 
                         <button class="dm-button"
                             @click="startDirectMessage(selectedProfile)">
@@ -281,6 +280,7 @@
                     <div v-if="loginStage === 'check'">
                         <p>Enter your email to get started:</p>
                         <input v-model="email" type="email" placeholder="Email" @keyup.enter="checkUser"/>
+                        <p v-if="emailError" class="login-error">{{ emailError }}</p>
                         <button @click="checkUser">Continue</button>
                     </div>
                     

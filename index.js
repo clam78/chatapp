@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import { GraffitiLocal } from "@graffiti-garden/implementation-local";
+// import { GraffitiLocal } from "@graffiti-garden/implementation-local";
 import { GraffitiRemote } from "@graffiti-garden/implementation-remote";
 import { GraffitiPlugin } from "@graffiti-garden/wrapper-vue";
 
@@ -8,7 +8,8 @@ const raw = localStorage.getItem("graffitiIdentity");
 const identity = raw ? JSON.parse(raw) : undefined;
 const actor = identity?.actor;
 
-const graffiti = new GraffitiLocal(identity);
+// const graffiti = new GraffitiLocal(identity);
+const graffiti = new GraffitiRemote("https://pod.graffiticode.com", identity);
 
 const actorFromStorage = actor || null;
 
@@ -40,6 +41,7 @@ const app = createApp({
       guests: "",
       enteredPassword: "",
       loginError: "",
+      emailError: "",
       currentUser: "",
       users: JSON.parse(localStorage.getItem("users") || '{}'), // all users
 
@@ -84,11 +86,17 @@ const app = createApp({
 
   methods: {
     checkUser() {
-        if (this.email in this.users) {
-          this.loginStage = 'login'; // user exists
-        } else {
-          this.loginStage = 'create1'; // new user
-        }
+      if (!this.email.trim()) {
+        this.emailError = "Please enter an email address";
+        return;
+      }
+      this.emailError = "";
+
+      if (this.email in this.users) {
+        this.loginStage = 'login'; // user exists
+      } else {
+        this.loginStage = 'create1'; // new user
+      }
     },
 
     createAccount() {
@@ -127,15 +135,6 @@ const app = createApp({
 
     createAccount2() {
 
-      // this.users[this.email] = {
-      //     name: this.name,
-      //     email: this.email,
-      //     pronouns: this.pronouns,
-      //     password: this.password,
-      //     sleep: this.sleep,
-      //     tidiness: this.tidiness,
-      //     guests: this.guests,
-      // };
       const key = this.currentUser;
       Object.assign(this.users[key], {
         sleep: this.sleep,
@@ -177,7 +176,6 @@ const app = createApp({
 
         } else {
           this.loginError = "Incorrect password, please try again.";
-          console.log("hey")
         }
       },
 
