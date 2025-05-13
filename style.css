@@ -204,6 +204,7 @@ fieldset {
 .title {
   background-color: #8abbe3;
   border-radius: 5px;
+  padding: 5px;
 }
 
 .sendmessage {
