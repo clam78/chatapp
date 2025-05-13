@@ -147,7 +147,15 @@ const app = createApp({
         // this.loginStage = "create2";
 
         await graffiti.login({ idp: "https://solidcommunity.net" });
-        this.$graffitiSession.value = identity;
+        
+        // new
+        const displayIdentity = {
+          actor: this.name, 
+          credential: null
+        };
+        this.$graffitiSession.value = displayIdentity;
+        //
+
         this.loginStage = "create2";
         
 
@@ -192,11 +200,20 @@ const app = createApp({
           
           localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
 
-          this.$graffitiSession.value = identity;
 
           // this.loginStage = "chat";
 
           await graffiti.login({ idp: "https://solidcommunity.net" });
+
+           // new
+           const displayIdentity = {
+            actor: this.name,
+            credential: null
+            };
+            this.$graffitiSession.value = displayIdentity;
+            //
+
+
           this.loginStage = "chat";
 
 
@@ -471,21 +488,12 @@ const app = createApp({
     if (stored) {
       const identity = JSON.parse(stored);
       await graffiti.login({ idp: "https://solidcommunity.net" });
-      this.$graffitiSession.value = identity;
-      // this.loginStage = "chat";
-      // this.selectedChannel = this.dormNames[0];
       
-      const webId = identity.actor;
-      if (!this.users[webId]) {
-        this.loginStage = "create1";
-        return; 
-      }
+      this.$graffitiSession.value = identity;
 
       this.loginStage = "chat";
       this.selectedChannel = this.dormNames[0];
-      await this.seedDormChatsOnce();
-      this.loadLeftChatsFor(webId);
-    }
+
     }
 
     if (!localStorage.getItem("dormChatsSeeded")) {
