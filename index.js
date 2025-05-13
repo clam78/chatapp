@@ -576,6 +576,7 @@ const app = createApp({
 
       const actor = this.$graffitiSession.value?.actor;
       if (!actor) return;
+      console.log("made it past actor")
   
       const key = Object.keys(this.users).find(email => this.users[email].name === actor);
       const user = key && this.users[key];
