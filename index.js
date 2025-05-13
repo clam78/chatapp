@@ -21,7 +21,7 @@ async function bootstrap() {
   if (rawIdentity) {
     const identity = JSON.parse(rawIdentity);
     if (!identity.credential) {
-      await graffiti.login({ idp: "https://solidcommunity.net" });
+      await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
     }
   }
 
@@ -162,7 +162,7 @@ const app = createApp({
         // this.loginStage = "create2";
 
         if (!this.$graffitiSession.value?.actor) {
-          await graffiti.login({ idp: "https://solidcommunity.net" });
+          await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
         }
 
         localStorage.setItem("displayName", this.name);
@@ -311,7 +311,7 @@ const app = createApp({
 
         // this.loginStage = "chat";
         if (!this.$graffitiSession.value?.actor) {
-          await graffiti.login({ idp: "https://solidcommunity.net" });
+          await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
         }
 
         localStorage.setItem("displayName", this.name);
