@@ -5,18 +5,6 @@ import { GraffitiPlugin } from "@graffiti-garden/wrapper-vue";
 
 const raw = localStorage.getItem("graffitiIdentity");
 
-let identity;
-  if (!raw || raw === "undefined" || raw === "null") {
-    identity = undefined;
-  } else {
-    try {
-      identity = JSON.parse(raw);
-    } catch (err) {
-      console.warn("corrupt graffitiIdentity removed from localStorage:", err);
-      localStorage.removeItem("graffitiIdentity");
-      identity = undefined;
-    }
-  }
 
 
 // const identity = raw ? JSON.parse(raw) : undefined;
@@ -40,8 +28,17 @@ async function bootstrap() {
   //     localStorage.setItem("graffitiIdentity", JSON.stringify(session));
   //   }
   // }
-  
+  if (!localStorage.getItem("graffitiIdentity")) {
+    localStorage.setItem(
+      "graffitiIdentity",
+      JSON.stringify(
+        await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" })
+      )
+    );
+  }
+
   const rawIdentity = localStorage.getItem("graffitiIdentity");
+  
   if (!rawIdentity || (() => {
       const id = JSON.parse(rawIdentity);
       return !id.actor || !id.credential;
