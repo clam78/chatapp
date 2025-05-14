@@ -3,20 +3,19 @@ import { createApp } from "vue";
 import { GraffitiRemote } from "@graffiti-garden/implementation-remote";
 import { GraffitiPlugin } from "@graffiti-garden/wrapper-vue";
 
-const raw = localStorage.getItem("graffitiIdentity");
-
+// const raw = localStorage.getItem("graffitiIdentity");
 
 
 // const identity = raw ? JSON.parse(raw) : undefined;
 
-const actor = identity?.actor;
+// const actor = identity?.actor;
 
 // const graffiti = new GraffitiLocal(identity);
-const graffiti = new GraffitiRemote("https://pod.graffiti.garden", identity);
+// const graffiti = new GraffitiRemote("https://pod.graffiti.garden", identity);
 
-const actorFromStorage = actor || null;
+// const actorFromStorage = actor || null;
 
-const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
+// const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
 
 async function bootstrap() {
   // const rawIdentity = localStorage.getItem("graffitiIdentity");
@@ -28,31 +27,24 @@ async function bootstrap() {
   //     localStorage.setItem("graffitiIdentity", JSON.stringify(session));
   //   }
   // }
-  const rawIdentity = localStorage.getItem("graffitiIdentity");
+  const raw = localStorage.getItem("graffitiIdentity");
   
   if (raw === null || raw === "undefined" || raw === "null") {
-    localStorage.setItem(
-      "graffitiIdentity",
-      JSON.stringify(
-        await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" })
-      )
-    );
+    const session = await new GraffitiRemote("https://pod.graffiti.garden").login({
+      idp: "https://solidcommunity.net",
+      prompt: "login"
+    });
+    localStorage.setItem("graffitiIdentity", JSON.stringify(session));
   }
 
-  
-  if (!rawIdentity || (() => {
-      const id = JSON.parse(rawIdentity);
-      return !id.actor || !id.credential;
-    })()
-  ) {
-    const session = await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
-    const normalized = {
-       actor:      session.webId,
-       credential: session.credential
-     };
+  const identity = JSON.parse(localStorage.getItem("graffitiIdentity"));
+  const graffiti = new GraffitiRemote("https://pod.graffiti.garden", identity);
 
-    localStorage.setItem("graffitiIdentity", JSON.stringify(normalized));
-  }
+  const actor = identity?.actor;
+  const actorFromStorage = actor || null;
+  const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
+
+
 
 const app = createApp({
   data() {
