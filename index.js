@@ -27,19 +27,25 @@ async function bootstrap() {
   //     localStorage.setItem("graffitiIdentity", JSON.stringify(session));
   //   }
   // }
-  const raw = localStorage.getItem("graffitiIdentity");
+  let raw = localStorage.getItem("graffitiIdentity");
   
   if (raw === null || raw === "undefined" || raw === "null") {
     const session = await new GraffitiRemote("https://pod.graffiti.garden").login({
       idp: "https://solidcommunity.net",
       prompt: "login"
     });
-    localStorage.setItem("graffitiIdentity", JSON.stringify(session));
-  }
 
-  const identity = JSON.parse(localStorage.getItem("graffitiIdentity"));
+    const normalized = {
+      actor:      session.webId,
+      credential: session.credential
+    };
+
+    localStorage.setItem("graffitiIdentity", JSON.stringify(normalized));
+    raw = localStorage.getItem("graffitiIdentity");
+    };
+
+  const identity = JSON.parse(raw);
   const graffiti = new GraffitiRemote("https://pod.graffiti.garden", identity);
-
   const actor = identity?.actor;
   const actorFromStorage = actor || null;
   const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
