@@ -200,7 +200,7 @@ fieldset {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 100px;  
+  bottom: 150px;  
 }
 
 .chat-content ul {
@@ -236,10 +236,8 @@ fieldset {
 
 .sendmessage {
   position: absolute;
-  left: 0;
-  right: 0;
   bottom: 0;
-  height: 100px;
+  height: 150px;
   box-sizing: border-box;
   padding: 1rem;
   border-top: 1px solid #ddd;
