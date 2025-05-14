@@ -6,7 +6,10 @@ import { GraffitiPlugin } from "@graffiti-garden/wrapper-vue";
 
 const raw = localStorage.getItem("graffitiIdentity");
 
-const identity = raw ? JSON.parse(raw) : undefined;
+const identity = (raw && raw !== "undefined" && raw !== "null")
+  ? JSON.parse(raw)
+  : undefined;
+  
 const actor = identity?.actor;
 
 // const graffiti = new GraffitiLocal(identity);
