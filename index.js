@@ -17,25 +17,30 @@ const actorFromStorage = actor || null;
 const leftKey = `leftGroupChats_${actorFromStorage}` // track if someone left a groupchat
 
 async function bootstrap() {
-  const rawIdentity = localStorage.getItem("graffitiIdentity");
-  if (rawIdentity) {
-    const identity = JSON.parse(rawIdentity);
-    if (!identity.actor || !identity.credential) {
-      console.log("i lost my identity credential :(")
-      const session = await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
-      localStorage.setItem("graffitiIdentity", JSON.stringify(session));
-    }
-  }
-  
   // const rawIdentity = localStorage.getItem("graffitiIdentity");
-  // if (!rawIdentity || (() => {
-  //     const id = JSON.parse(rawIdentity);
-  //     return !id.actor || !id.credential;
-  //   })()
-  // ) {
-  //   const session = await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
-  //   localStorage.setItem("graffitiIdentity", JSON.stringify(session));
+  // if (rawIdentity) {
+  //   const identity = JSON.parse(rawIdentity);
+  //   if (!identity.actor || !identity.credential) {
+  //     console.log("i lost my identity credential :(")
+  //     const session = await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
+  //     localStorage.setItem("graffitiIdentity", JSON.stringify(session));
+  //   }
   // }
+  
+  const rawIdentity = localStorage.getItem("graffitiIdentity");
+  if (!rawIdentity || (() => {
+      const id = JSON.parse(rawIdentity);
+      return !id.actor || !id.credential;
+    })()
+  ) {
+    const session = await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
+    const normalized = {
+       actor:      session.webId,
+       credential: session.credential
+     };
+
+    localStorage.setItem("graffitiIdentity", JSON.stringify(normalized));
+  }
 
 const app = createApp({
   data() {
