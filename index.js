@@ -58,8 +58,7 @@ async function bootstrap() {
   let identity = JSON.parse(localStorage.getItem("graffitiIdentity") || "null");
 
   if (!identity || !identity.actor) {
-    const loginClient = new GraffitiRemote("https://pod.graffiti.garden");
-    const session = await loginClient.login({
+    const session = await new GraffitiRemote("https://pod.graffiti.garden").login({
       idp: "https://solidcommunity.net",
       prompt: "login"
     });
@@ -71,10 +70,12 @@ async function bootstrap() {
       credential: session.credential
     };
     localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
-  }
+  };
 
   const graffiti = new GraffitiRemote("https://pod.graffiti.garden", identity);
-
+  const actor = identity?.actor;
+  const actorFromStorage = actor || null;
+  const leftKey = `leftGroupChats_${actorFromStorage}`; // track if someone left a groupchat
 
 
 const app = createApp({
@@ -693,8 +694,6 @@ const app = createApp({
   }
 });
 app.use(GraffitiPlugin, { graffiti });
-
-
 app.mount("#app");
 }
 
