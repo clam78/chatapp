@@ -196,6 +196,7 @@ fieldset {
   overflow-y: auto;
   padding: 1rem;
   padding-bottom: 5rem;
+  bottom: 100px;  
 }
 
 .chat-content ul {
@@ -230,13 +231,14 @@ fieldset {
 }
 
 .sendmessage {
-  position: static; 
-  margin-top: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100px;
+  box-sizing: border-box;
   padding: 1rem;
-
-  /* position: absolute;
-  bottom: 1rem; */
-  right: 1rem;
+  border-top: 1px solid #ddd;
 }
 
 .sendmessage textarea {
@@ -264,4 +266,9 @@ fieldset {
   float: right;
   text-align: right;
   color: #0066cc;
+}
+
+.main {
+  position: relative;
+  height: 100%;
 }
