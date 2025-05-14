@@ -21,8 +21,9 @@ async function bootstrap() {
   if (rawIdentity) {
     const identity = JSON.parse(rawIdentity);
     if (!identity.actor || !identity.credential) {
-      console.log("i lost my identity credential")
-      await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
+      console.log("i lost my identity credential :(")
+      const session = await graffiti.login({ idp: "https://solidcommunity.net", prompt: "login" });
+      localStorage.setItem("graffitiIdentity", JSON.stringify(session));
     }
   }
 
@@ -202,20 +203,27 @@ const app = createApp({
         tidiness: this.tidiness,
         guests: this.guests
       });
-
       localStorage.setItem("users", JSON.stringify(this.users));
 
-      const identity = { actor: this.users[this.email].name, credential: null };
+      // const identity = { actor: this.users[this.email].name, credential: null };
+      // localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
 
-      localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
-      
-      this.$graffitiSession.value = identity;
-      // location.reload();
+      const saved = JSON.parse(localStorage.getItem("graffitiIdentity"));
+      saved.actor = this.users[this.email].name;
+
+      localStorage.setItem("displayName", this.users[this.email].name);
+      this.displayName = this.users[this.email].name;
+
+
+      localStorage.setItem("graffitiIdentity", JSON.stringify(saved));
+      this.$graffitiSession.value.actor = saved.actor;
+
+    
+      // this.$graffitiSession.value = identity;
 
       this.loginStage = "chat";
       this.selectedChannel = this.dormNames[0];
       this.selectedProfile = null;
-    
 
   },
 
@@ -240,8 +248,6 @@ const app = createApp({
       };
       this.currentUser = this.email;
       }
-
-
     localStorage.setItem("users", JSON.stringify(this.users));
 
     // const identity = { actor: this.users[this.email].name, credential: null };
@@ -251,12 +257,13 @@ const app = createApp({
     const saved = JSON.parse(localStorage.getItem("graffitiIdentity") || "{}");
     saved.actor = this.users[this.email].name;
 
+    localStorage.setItem("displayName", this.users[this.email].name);
+    this.displayName = this.users[this.email].name;
+
     localStorage.setItem("graffitiIdentity", JSON.stringify(saved));
     this.$graffitiSession.value.actor = saved.actor;
-    
 
     this.loginStage = "editingcreate2";
-    
 
 },
 
