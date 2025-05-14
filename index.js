@@ -28,7 +28,9 @@ async function bootstrap() {
   //     localStorage.setItem("graffitiIdentity", JSON.stringify(session));
   //   }
   // }
-  if (!localStorage.getItem("graffitiIdentity")) {
+  const rawIdentity = localStorage.getItem("graffitiIdentity");
+  
+  if (raw === null || raw === "undefined" || raw === "null") {
     localStorage.setItem(
       "graffitiIdentity",
       JSON.stringify(
@@ -37,7 +39,6 @@ async function bootstrap() {
     );
   }
 
-  const rawIdentity = localStorage.getItem("graffitiIdentity");
   
   if (!rawIdentity || (() => {
       const id = JSON.parse(rawIdentity);
