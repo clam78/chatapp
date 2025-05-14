@@ -5,7 +5,21 @@ import { GraffitiPlugin } from "@graffiti-garden/wrapper-vue";
 
 const raw = localStorage.getItem("graffitiIdentity");
 
-const identity = raw ? JSON.parse(raw) : undefined;
+let identity;
+  if (!raw || raw === "undefined" || raw === "null") {
+    identity = undefined;
+  } else {
+    try {
+      identity = JSON.parse(raw);
+    } catch (err) {
+      console.warn("corrupt graffitiIdentity removed from localStorage:", err);
+      localStorage.removeItem("graffitiIdentity");
+      identity = undefined;
+    }
+  }
+
+
+// const identity = raw ? JSON.parse(raw) : undefined;
 
 const actor = identity?.actor;
 
