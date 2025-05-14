@@ -208,7 +208,7 @@ const app = createApp({
       // const identity = { actor: this.users[this.email].name, credential: null };
       // localStorage.setItem("graffitiIdentity", JSON.stringify(identity));
 
-      const saved = JSON.parse(localStorage.getItem("graffitiIdentity"));
+      const saved = JSON.parse(localStorage.getItem("graffitiIdentity") || "{}");
       saved.actor = this.users[this.email].name;
 
       localStorage.setItem("displayName", this.users[this.email].name);
