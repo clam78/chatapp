@@ -3,7 +3,6 @@ import { createApp } from "vue";
 import { GraffitiRemote } from "@graffiti-garden/implementation-remote";
 import { GraffitiPlugin } from "@graffiti-garden/wrapper-vue";
 
-
 const raw = localStorage.getItem("graffitiIdentity");
 
 const identity = raw ? JSON.parse(raw) : undefined;
@@ -415,28 +414,28 @@ const app = createApp({
 
     // very similar to editing message methods above
 
-    startGroupChatEditing(chat) {
-      this.editingGroupChatID = chat.url;
-      this.editedGroupChat = chat.value.object.name;
-    },
+    // startGroupChatEditing(chat) {
+    //   this.editingGroupChatID = chat.url;
+    //   this.editedGroupChat = chat.value.object.name;
+    // },
 
-    async submitGroupChatEdit(chat) {
-      if (!this.editedGroupChat.trim()) return;
-      await this.$graffiti.patch({
-        value: [
-          {
-            op: "replace",
-            path: "/object/name",
-            value: this.editedGroupChat,
-          }
-        ]
-      },
-      chat,
-      this.$graffitiSession.value
-    );
-    this.editingGroupChatID = null;
-    this.editedGroupChat = "";
-    },
+    // async submitGroupChatEdit(chat) {
+    //   if (!this.editedGroupChat.trim()) return;
+    //   await this.$graffiti.patch({
+    //     value: [
+    //       {
+    //         op: "replace",
+    //         path: "/object/name",
+    //         value: this.editedGroupChat,
+    //       }
+    //     ]
+    //   },
+    //   chat,
+    //   this.$graffitiSession.value
+    // );
+    // this.editingGroupChatID = null;
+    // this.editedGroupChat = "";
+    // },
 
 
     joinGroupChat(chat) {
